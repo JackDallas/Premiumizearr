@@ -23,6 +23,7 @@ build/web:
 	mkdir build
 	cd web && npm run build
 	mkdir -p build/static/ && cp -r web/public/* build/static/
+	cp init/premiumizearrd.service build/
 
 clean:
 	$(RM) -rf build
