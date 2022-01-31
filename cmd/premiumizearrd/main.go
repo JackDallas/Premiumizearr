@@ -2,8 +2,6 @@ package main
 
 import (
 	"flag"
-	"io"
-	"os"
 	"time"
 
 	"github.com/jackdallas/premiumizearr/internal/arr"
@@ -11,6 +9,7 @@ import (
 	"github.com/jackdallas/premiumizearr/internal/service"
 	"github.com/jackdallas/premiumizearr/internal/web_service"
 	"github.com/jackdallas/premiumizearr/pkg/premiumizeme"
+	"github.com/orandin/lumberjackrus"
 	log "github.com/sirupsen/logrus"
 	"golift.io/starr"
 	"golift.io/starr/radarr"
@@ -33,15 +32,43 @@ func main() {
 		lvl = log.InfoLevel
 	}
 	log.SetLevel(lvl)
+	hook, err := lumberjackrus.NewHook(
+		&lumberjackrus.LogFile{
+			Filename:   "/var/log/premiumizearr.general.log",
+			MaxSize:    100,
+			MaxBackups: 1,
+			MaxAge:     1,
+			Compress:   false,
+			LocalTime:  false,
+		},
+		log.InfoLevel,
+		&log.TextFormatter{},
+		&lumberjackrus.LogFileOpts{
+			log.InfoLevel: &lumberjackrus.LogFile{
+				Filename:   "/var/log/premiumizearr.info.log",
+				MaxSize:    100,
+				MaxBackups: 1,
+				MaxAge:     1,
+				Compress:   false,
+				LocalTime:  false,
+			},
+			log.ErrorLevel: &lumberjackrus.LogFile{
+				Filename:   "/var/log/premiumizearr.error.log",
+				MaxSize:    100,   // optional
+				MaxBackups: 1,     // optional
+				MaxAge:     1,     // optional
+				Compress:   false, // optional
+				LocalTime:  false, // optional
+			},
+		},
+	)
 
-	logFile, err := os.OpenFile("premiumizearr.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		log.Error(err)
-	} else {
-		log.SetOutput(io.MultiWriter(logFile, os.Stdout))
+		panic(err)
 	}
 
-	log.Info("")
+	log.AddHook(hook)
+
 	log.Info("---------- Starting premiumizearr daemon ----------")
 	log.Info("")
 
