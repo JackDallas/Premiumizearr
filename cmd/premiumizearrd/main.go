@@ -34,7 +34,7 @@ func main() {
 	log.SetLevel(lvl)
 	hook, err := lumberjackrus.NewHook(
 		&lumberjackrus.LogFile{
-			Filename:   "/var/log/premiumizearr.general.log",
+			Filename:   "/opt/premiumizearrd/premiumizearr.general.log",
 			MaxSize:    100,
 			MaxBackups: 1,
 			MaxAge:     1,
@@ -45,7 +45,7 @@ func main() {
 		&log.TextFormatter{},
 		&lumberjackrus.LogFileOpts{
 			log.InfoLevel: &lumberjackrus.LogFile{
-				Filename:   "/var/log/premiumizearr.info.log",
+				Filename:   "/opt/premiumizearrd/premiumizearr.info.log",
 				MaxSize:    100,
 				MaxBackups: 1,
 				MaxAge:     1,
@@ -53,7 +53,7 @@ func main() {
 				LocalTime:  false,
 			},
 			log.ErrorLevel: &lumberjackrus.LogFile{
-				Filename:   "/var/log/premiumizearr.error.log",
+				Filename:   "/opt/premiumizearrd/premiumizearr.error.log",
 				MaxSize:    100,   // optional
 				MaxBackups: 1,     // optional
 				MaxAge:     1,     // optional

@@ -48,6 +48,8 @@ nfpms:
     # Defaults to `ProjectName`.
     package_name: premiumizearr
 
+    bindir: /opt/premiumizearrd
+
     # Your app's vendor.
     # Default is empty.
     vendor: Jack Dallas.
@@ -75,6 +77,8 @@ nfpms:
     contents:
       # Basic file that applies to all packagers
       - src: build/static/*
-        dst: /usr/local/bin/static/
+        dst: /opt/premiumizearrd/static/
       - src: init/premiumizearrd.service
-        dst: /etc/systemd/system/
+        dst: /etc/systemd/system/premiumizearrd.service
+    scripts:
+      postinstall: "scripts/postinstall.sh"
