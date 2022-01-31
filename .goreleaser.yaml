@@ -1,0 +1,80 @@
+before:
+  hooks:
+    - go mod tidy
+    - make web
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+    main: ./cmd/premiumizearrd
+    binary: premiumizearrd
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+
+archives:
+  - format_overrides:
+      - goos: windows
+        format: zip
+    wrap_in_directory: true
+    files:
+      - README.md
+      - LICENSE
+      - src: build/*.service
+        dst: ./
+        strip_parent: true
+      - src: build/static/*
+        dst: static
+        strip_parent: true
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+nfpms:
+  # note that this is an array of nfpm configs
+  -
+    # Name of the package.
+    # Defaults to `ProjectName`.
+    package_name: premiumizearr
+
+    # Your app's vendor.
+    # Default is empty.
+    vendor: Jack Dallas.
+
+    # Template to your app's homepage.
+    # Default is empty.
+    homepage: https://github.com/JackDallas/Premiumizearr
+
+    # Your app's maintainer (probably you).
+    # Default is empty.
+    maintainer: Dallas <jack-dallas@outlook.com>
+
+    # Template to your app's description.
+    # Default is empty.
+    description: Service to connect premiumize.me to Arr clients.
+
+    # Your app's license.
+    # Default is empty.
+    license: GPLv3
+
+    # Formats to be generated.
+    formats:
+      - deb
+
+    contents:
+      # Basic file that applies to all packagers
+      - src: build/static/*
+        dst: /usr/local/bin/static/
+      - src: init/premiumizearrd.service
+        dst: /etc/systemd/system/
