@@ -18,21 +18,15 @@ func (UploadQueue *StringQueue) Add(path string) {
 	UploadQueue.queue = append(UploadQueue.queue, path)
 }
 
-func (UploadQueue *StringQueue) GetTopOfQueue() string {
+func (UploadQueue *StringQueue) PopTopOfQueue() (bool, string) {
 	UploadQueue.mutex.Lock()
 	defer UploadQueue.mutex.Unlock()
 	if len(UploadQueue.queue) > 0 {
-		return UploadQueue.queue[0]
-	}
-	return ""
-}
-
-func (UploadQueue *StringQueue) DeleteTopOfQueue() {
-	UploadQueue.mutex.Lock()
-	defer UploadQueue.mutex.Unlock()
-	if len(UploadQueue.queue) > 0 {
+		rtn := UploadQueue.queue[0]
 		UploadQueue.queue = UploadQueue.queue[1:]
+		return true, rtn
 	}
+	return false, ""
 }
 
 func (UploadQueue *StringQueue) GetQueue() []string {

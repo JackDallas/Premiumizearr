@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 
+	"github.com/jackdallas/premiumizearr/pkg/premiumizeme"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -36,52 +36,6 @@ func GetTempDir() (string, error) {
 		return "", err
 	}
 	return dir, nil
-}
-
-func DownloadAndExtractZip(link string, destination string) error {
-	tempDir, err := GetTempDir()
-	if err != nil {
-		return err
-	}
-
-	resp, err := http.Get(link)
-	if err != nil {
-		return err
-	}
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("HTTP status code: %d When trying to download %s", resp.StatusCode, link)
-	}
-	splitString := strings.Split(link, "/")
-	savePath := path.Join(tempDir, splitString[len(splitString)-1])
-
-	log.Trace("Downloading to: ", savePath)
-	out, err := os.Create(savePath)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		return err
-	}
-
-	log.Tracef("Unzipping %s to %s", savePath, destination)
-	err = Unzip(savePath, destination)
-	if err != nil {
-		return err
-	}
-
-	log.Tracef("Removing zip %s from system", savePath)
-	err = os.RemoveAll(savePath)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // https://golangcode.com/unzip-files-in-go/
@@ -143,4 +97,32 @@ func StringInSlice(a string, list []string) int {
 		}
 	}
 	return -1
+}
+
+func GetDownloadsFolderIDFromPremiumizeme(premiumizemeClient *premiumizeme.Premiumizeme) string {
+	var downloadsFolderID string
+	folders, err := premiumizemeClient.GetFolders()
+	if err != nil {
+		log.Errorf("Error getting folders: %s", err)
+		log.Fatalf("Cannot read folders from premiumize.me, exiting!")
+	}
+
+	const folderName = "arrDownloads"
+
+	for _, folder := range folders {
+		if folder.Name == folderName {
+			downloadsFolderID = folder.ID
+			log.Debugf("Found downloads folder with ID: %s", folder.ID)
+		}
+	}
+
+	if len(downloadsFolderID) == 0 {
+		id, err := premiumizemeClient.CreateFolder(folderName)
+		if err != nil {
+			log.Fatalf("Cannot create downloads folder on premiumize.me, exiting! %+v", err)
+		}
+		downloadsFolderID = id
+	}
+
+	return downloadsFolderID
 }

@@ -1,177 +1,150 @@
 <script>
-  import { mdiArrowDown, mdiArrowUp, mdiSwapVertical } from "@mdi/js";
-  import {
-    DataTable,
-    DataTableHead,
-    DataTableRow,
-    DataTableCell,
-    DataTableBody,
-    MaterialApp,
-    Icon,
-    Button,
-  } from "svelte-materialify";
+  import APITable from "./components/APITable.svelte";
+  import "carbon-components-svelte/css/g100.css";
+  import { Grid, Row, Column } from "carbon-components-svelte";
+  import DateTime from "luxon";
 
-  let theme = "dark";
-  let sortField = "progress";
-  let sortDirection = true;
-  let currentSortSVG = mdiArrowDown;
+  let dlSpeed = 0;
 
-  let transfers = [];
-  let downloads = [];
+  let webRoot = new URL(window.location.href).pathname;
 
-  UpdateFromAPI();
-
-  setInterval(() => {
-    UpdateFromAPI();
-  }, 10 * 1000);
-
-  function FileNameFromPath(path) {
-    return path.split("/").pop();
-  }
-
-  function UpdateFromAPI() {
-    // Refresh from endpoints
-    // transfers
-    fetch("/api/transfers")
-      .then((res) => res.json())
-      .then((data) => {
-        transfers = data;
-        SortTransfersBy(sortField);
-      });
-
-    // downloads
-    fetch("/api/downloads")
-      .then((res) => res.json())
-      .then((data) => {
-        downloads = data;
-        SortTransfersBy(sortField);
-      });
-  }
-
-  function SortTransfersBy(field) {
-    if (field == sortField) {
-      sortDirection = !sortDirection;
-      currentSortSVG = sortDirection ? mdiArrowDown : mdiArrowUp;
+  function parseDLSpeedFromMessage(m) {
+    if (m == "Loading..." || m == undefined) return 0;
+    let speed = m.split(" ")[0];
+    speed = speed.replace(",", "");
+    let unit = m.split(" ")[1];
+    if (Number.isNaN(speed)) {
+      console.log("Speed is not a number: ", speed);
+      console.log("Message: ", message);
+      return 0;
     }
-
-    transfers = transfers.sort((a, b) => {
-      if (sortDirection) {
-        if (a[field] < b[field]) {
-          return -1;
-        }
-        if (a[field] > b[field]) {
-          return 1;
-        }
-        return 0;
-      } else {
-        if (a[field] > b[field]) {
-          return -1;
-        }
-        if (a[field] < b[field]) {
-          return 1;
-        }
+    if (unit === undefined || unit === null || unit == "") {
+      console.log("Unit undefined in : " + m);
+      return 0;
+    } else {
+      try {
+        unit = unit.toUpperCase();
+      } catch (error) {
         return 0;
       }
-    });
-    sortField = field;
+      unit = unit.replace("/", "");
+      unit = unit.substring(0, 2);
+      switch (unit) {
+        case "KB":
+          return speed * 1024;
+        case "MB":
+          return speed * 1024 * 1024;
+        case "GB":
+          return speed * 1024 * 1024 * 1024;
+        default:
+          console.log("Unknown unit: " + unit);
+          return 0;
+      }
+    }
+  }
+
+  function HumanReadableSpeed(bytes) {
+    if (bytes < 1024) {
+      return bytes + " B/s";
+    } else if (bytes < 1024 * 1024) {
+      return (bytes / 1024).toFixed(2) + " KB/s";
+    } else if (bytes < 1024 * 1024 * 1024) {
+      return (bytes / 1024 / 1024).toFixed(2) + " MB/s";
+    } else {
+      return (bytes / 1024 / 1024 / 1024).toFixed(2) + " GB/s";
+    }
+  }
+
+  function dataToRows(data) {
+    let rows = [];
+    dlSpeed = 0;
+    if (!data) return rows;
+
+    for (let i = 0; i < data.length; i++) {
+      let d = data[i];
+      rows.push({
+        id: d.id,
+        name: d.name,
+        status: d.status,
+        progress: (d.progress * 100).toFixed(0) + "%",
+        message: d.message,
+      });
+
+      let speed = parseDLSpeedFromMessage(d.message);
+      if (!Number.isNaN(speed)) {
+        dlSpeed += speed;
+      } else {
+        console.error("Invalid speed: " + d.message);
+      }
+    }
+    return rows;
+  }
+
+  function downloadsToRows(downloads) {
+    let rows = [];
+    if (!downloads) return rows;
+
+    for (let i = 0; i < downloads.length; i++) {
+      let d = downloads[i];
+      rows.push({
+        Added: DateTime.fromMillis(d.added).toFormat('dd hh:mm:ss a'),
+        name: d.name,
+        progress: (d.progress * 100).toFixed(0) + "%",
+      });
+    }
   }
 </script>
 
-<MaterialApp {theme}>
-  <h2>Premiumizearrd</h2>
-  <h3>Transfers</h3>
-  <DataTable>
-    <DataTableHead>
-      <DataTableRow>
-        <DataTableCell>
-          Name
-          {#if sortField == "name"}
-            <Button
-              icon="true"
-              size="1"
-              on:click={SortTransfersBy.bind(this, "name")}
-            >
-              <Icon path={currentSortSVG} />
-            </Button>
-          {:else}
-            <Button
-              icon="true"
-              size="1"
-              on:click={SortTransfersBy.bind(this, "name")}
-            >
-              <Icon path={mdiSwapVertical} />
-            </Button>
-          {/if}
-        </DataTableCell>
-        <DataTableCell>
-          Status
-          {#if sortField == "status"}
-            <Button
-              icon="true"
-              size="1"
-              on:click={SortTransfersBy.bind(this, "status")}
-            >
-              <Icon path={currentSortSVG} />
-            </Button>
-          {:else}
-            <Button
-              icon="true"
-              size="1"
-              on:click={SortTransfersBy.bind(this, "status")}
-            >
-              <Icon path={mdiSwapVertical} />
-            </Button>
-          {/if}
-        </DataTableCell>
-        <DataTableCell numeric>
-          Progress
-          {#if sortField == "progress"}
-            <Button
-              icon="true"
-              size="1"
-              on:click={SortTransfersBy.bind(this, "progress")}
-            >
-              <Icon path={currentSortSVG} />
-            </Button>
-          {:else}
-            <Button
-              icon="true"
-              size="1"
-              on:click={SortTransfersBy.bind(this, "progress")}
-            >
-              <Icon path={mdiSwapVertical} />
-            </Button>
-          {/if}
-        </DataTableCell>
-        <DataTableCell>Message</DataTableCell>
-      </DataTableRow>
-    </DataTableHead>
-    <DataTableBody>
-      {#each transfers as transfer}
-        <DataTableRow>
-          <DataTableCell>{transfer.name}</DataTableCell>
-          <DataTableCell>{transfer.status}</DataTableCell>
-          <DataTableCell numeric
-            >{(transfer.progress * 100).toFixed(0)}%</DataTableCell
-          >
-          <DataTableCell>{transfer.message}</DataTableCell>
-        </DataTableRow>
-      {/each}
-    </DataTableBody>
-  </DataTable>
-  <h3>Downloads Queue</h3>
-  <DataTable>
-    <DataTableHead>
-      <DataTableRow>
-        <DataTableCell>FileName</DataTableCell>
-      </DataTableRow>
-    </DataTableHead>
-    <DataTableBody>
-      {#each downloads as download}
-        <DataTableRow>
-          <DataTableCell>{FileNameFromPath(download)}</DataTableCell>
-        </DataTableRow>
-      {/each}
-    </DataTableBody>
-  </DataTable>
-</MaterialApp>
+<main>
+  <Grid fullWidth>
+    <Row>
+      <Column md={4} >
+        <h3>Blackhole</h3>
+        <APITable
+          headers={[
+            { key: "id", value: "Pos" },
+            { key: "name", value: "Name", sort: false },
+          ]}
+          {webRoot}
+          APIpath="/api/blackhole"
+          zebra={true}
+          totalName="In Queue: "
+        />
+      </Column>
+      <Column md={4} >
+        <h3>Downloads</h3>
+        <APITable
+          headers={[
+            { key: "added", value: "Added" },
+            { key: "name", value: "Name" },
+            { key: "progress", value: "Progress" },
+            { key: "speed", value: "Speed" },
+          ]}
+          updateTimeSeconds={2}
+          {webRoot}
+          APIpath="/api/downloads"
+          zebra={true}
+          totalName="Downloading: "
+        />
+      </Column>
+    </Row>
+    <Row>
+      <Column>
+        <h3>Transfers</h3>
+        <p>Download Speed: {HumanReadableSpeed(dlSpeed)}</p>
+        <APITable
+          headers={[
+            { key: "name", value: "Name" },
+            { key: "status", value: "Status" },
+            { key: "progress", value: "Progress" },
+            { key: "message", value: "Message", sort: false },
+          ]}
+          {webRoot}
+          APIpath="/api/transfers"
+          zebra={true}
+          {dataToRows}
+        />
+      </Column>
+    </Row>
+  </Grid>
+</main>

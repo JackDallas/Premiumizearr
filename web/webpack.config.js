@@ -1,12 +1,15 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { ESBuildMinifyPlugin } = require("esbuild-loader");
 const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const { optimizeImports } = require("carbon-preprocess-svelte");
 
 const mode = process.env.NODE_ENV || 'development';
 const prod = mode === 'production';
 
 module.exports = {
 	entry: {
-		'build/bundle': ['./src/main.js']
+		'bundle': ['./src/main.js']
 	},
 	resolve: {
 		alias: {
@@ -16,7 +19,7 @@ module.exports = {
 		mainFields: ['svelte', 'browser', 'module', 'main']
 	},
 	output: {
-		path: path.join(__dirname, '/public'),
+		path: path.join(__dirname, '/dist'),
 		filename: '[name].js',
 		chunkFilename: '[name].[id].js'
 	},
@@ -25,43 +28,43 @@ module.exports = {
 			{
 				test: /\.svelte$/,
 				use: {
-					loader: 'svelte-loader',
+					loader: "svelte-loader",
 					options: {
-						compilerOptions: {
-							dev: !prod
-						},
-						emitCss: prod,
-						hotReload: !prod
-					}
-				}
+						preprocess: [optimizeImports()],
+						hotReload: !prod,
+						compilerOptions: { dev: !prod },
+					},
+				},
 			},
 			{
 				test: /\.css$/,
-				use: [
-					MiniCssExtractPlugin.loader,
-					'css-loader'
-				]
+				use: [MiniCssExtractPlugin.loader, "css-loader"],
 			},
 			{
-				// required to prevent errors from Svelte on Webpack 5+
 				test: /node_modules\/svelte\/.*\.mjs$/,
-				resolve: {
-					fullySpecified: false
-				}
-			}
+				resolve: { fullySpecified: false },
+			},
 		]
 	},
 	mode,
 	plugins: [
 		new MiniCssExtractPlugin({
 			filename: '[name].css'
+		}),
+		new CopyWebpackPlugin({
+			patterns: [
+				{ from: 'public' }
+			]
 		})
 	],
-	devtool: prod ? false : 'source-map',
+	devtool: 'source-map',
 	devServer: {
 		hot: true,
 		proxy: {	
-			'/api': 'http://127.0.0.1:8182'
+			'/api': 'https://projectmouseion.com/premiumizearr/api'
 		}
-	}
+	},
+	optimization: {
+		minimizer: [new ESBuildMinifyPlugin({ target: "es2015" })],
+	},
 };

@@ -69,7 +69,80 @@ func (pm *Premiumizeme) GetTransfers() ([]Transfer, error) {
 	return res.Transfers, nil
 }
 
-func (pm *Premiumizeme) CreateTransfer(filePath string) error {
+func (pm *Premiumizeme) ListFolder(folderID string) ([]Item, error) {
+	var ret []Item
+	url, err := pm.createPremiumizemeURL("/folder/list")
+	if err != nil {
+		return ret, err
+	}
+
+	q := url.Query()
+	q.Set("id", folderID)
+	url.RawQuery = q.Encode()
+
+	client := &http.Client{}
+	request, err := http.NewRequest("GET", url.String(), nil)
+	if err != nil {
+		return ret, err
+	}
+
+	resp, err := client.Do(request)
+	if err != nil {
+		return ret, err
+	}
+
+	if resp.StatusCode != 200 {
+		return ret, fmt.Errorf("error listing folder: %s (%d)", resp.Status, resp.StatusCode)
+	}
+
+	defer resp.Body.Close()
+	res := ListFoldersResponse{}
+	log.Trace("Reading response")
+	err = json.NewDecoder(resp.Body).Decode(&res)
+
+	if err != nil {
+		return ret, err
+	}
+
+	if res.Status != "success" {
+		return ret, fmt.Errorf(res.Message)
+	}
+
+	return res.Content, nil
+}
+
+func (pm *Premiumizeme) GetFolders() ([]Item, error) {
+	log.Trace("Getting folder list from premiumize.me")
+	url, err := pm.createPremiumizemeURL("/folder/list")
+	if err != nil {
+		return nil, err
+	}
+
+	var ret []Item
+	req, _ := http.NewRequest("GET", url.String(), nil)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return ret, err
+	}
+
+	defer resp.Body.Close()
+	res := ListFoldersResponse{}
+	err = json.NewDecoder(resp.Body).Decode(&res)
+
+	if res.Status != "success" {
+		return ret, fmt.Errorf("%s", res.Status)
+	}
+
+	if err != nil {
+		return ret, err
+	}
+
+	log.Tracef("Received %d Folders", len(res.Content))
+	return res.Content, nil
+}
+
+func (pm *Premiumizeme) CreateTransfer(filePath string, parentID string) error {
 	//TODO: handle file size, i.e. incorrect file being saved
 	log.Trace("Opening file: ", filePath)
 	file, err := os.Open(filePath)
@@ -93,9 +166,9 @@ func (pm *Premiumizeme) CreateTransfer(filePath string) error {
 
 	switch filepath.Ext(file.Name()) {
 	case ".nzb":
-		request, err = createNZBRequest(file, &url)
+		request, err = createNZBRequest(file, &url, parentID)
 	case ".magnet":
-		request, err = createMagnetRequest(file, &url)
+		request, err = createMagnetRequest(file, &url, parentID)
 	}
 
 	if err != nil {
@@ -129,6 +202,92 @@ func (pm *Premiumizeme) CreateTransfer(filePath string) error {
 	return nil
 }
 
+func (pm *Premiumizeme) DeleteFolder(folderID string) error {
+	url, err := pm.createPremiumizemeURL("/folder/delete")
+	if err != nil {
+		return err
+	}
+
+	q := url.Query()
+	q.Set("id", folderID)
+	url.RawQuery = q.Encode()
+
+	client := &http.Client{}
+	request, err := http.NewRequest("DELETE", url.String(), nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := client.Do(request)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("error deleting folder: %s (%d)", resp.Status, resp.StatusCode)
+	}
+
+	defer resp.Body.Close()
+	res := SimpleResponse{}
+	log.Trace("Reading response")
+	err = json.NewDecoder(resp.Body).Decode(&res)
+
+	if err != nil {
+		return err
+	}
+
+	if res.Status != "success" {
+		return fmt.Errorf(res.Message)
+	}
+
+	log.Tracef("Folder deleted: %+v", res)
+
+	return nil
+}
+
+func (pm *Premiumizeme) CreateFolder(folderName string) (string, error) {
+	url, err := pm.createPremiumizemeURL("/folder/create")
+	if err != nil {
+		return "", err
+	}
+
+	q := url.Query()
+	q.Set("name", folderName)
+	url.RawQuery = q.Encode()
+
+	client := &http.Client{}
+	request, err := http.NewRequest("POST", url.String(), nil)
+	if err != nil {
+		return "", err
+	}
+
+	resp, err := client.Do(request)
+	if err != nil {
+		return "", err
+	}
+
+	if resp.StatusCode != 200 {
+		return "", fmt.Errorf("error creating folder: %s (%d)", resp.Status, resp.StatusCode)
+	}
+
+	defer resp.Body.Close()
+	res := CreateFolderResponse{}
+	log.Trace("Reading response")
+	err = json.NewDecoder(resp.Body).Decode(&res)
+
+	if err != nil {
+		return "", err
+	}
+
+	if res.Status != "success" {
+		return "", fmt.Errorf(res.Message)
+	}
+
+	log.Tracef("Folder created: %+v", res)
+
+	return res.ID, nil
+}
+
 func (pm *Premiumizeme) DeleteTransfer(id string) error {
 	url, err := pm.createPremiumizemeURL("/transfer/delete")
 	if err != nil {
@@ -151,7 +310,7 @@ func (pm *Premiumizeme) DeleteTransfer(id string) error {
 	}
 
 	defer resp.Body.Close()
-	res := DeleteTransferResponse{}
+	res := SimpleResponse{}
 	log.Trace("Reading response")
 	err = json.NewDecoder(resp.Body).Decode(&res)
 
@@ -168,7 +327,7 @@ func (pm *Premiumizeme) DeleteTransfer(id string) error {
 	return nil
 }
 
-func createNZBRequest(file *os.File, url *url.URL) (*http.Request, error) {
+func createNZBRequest(file *os.File, url *url.URL, parentID string) (*http.Request, error) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, err := writer.CreateFormFile("src", filepath.Base(file.Name()))
@@ -180,6 +339,18 @@ func createNZBRequest(file *os.File, url *url.URL) (*http.Request, error) {
 	io.Copy(part, file)
 	writer.Close()
 
+	part, err = writer.CreateFormField("folder_id")
+
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = part.Write([]byte(parentID))
+
+	if err != nil {
+		return nil, err
+	}
+
 	request, err := http.NewRequest("POST", url.String(), body)
 	request.Header.Add("Content-Type", writer.FormDataContentType())
 
@@ -190,7 +361,7 @@ func createNZBRequest(file *os.File, url *url.URL) (*http.Request, error) {
 	return request, nil
 }
 
-func createMagnetRequest(file *os.File, url *url.URL) (*http.Request, error) {
+func createMagnetRequest(file *os.File, url *url.URL, parentID string) (*http.Request, error) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, err := writer.CreateFormField("src")
@@ -201,6 +372,18 @@ func createMagnetRequest(file *os.File, url *url.URL) (*http.Request, error) {
 
 	io.Copy(part, file)
 	writer.Close()
+
+	part, err = writer.CreateFormField("folder_id")
+
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = part.Write([]byte(parentID))
+
+	if err != nil {
+		return nil, err
+	}
 
 	request, err := http.NewRequest("POST", url.String(), body)
 	request.Header.Add("Content-Type", writer.FormDataContentType())
