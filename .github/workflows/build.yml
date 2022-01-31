@@ -28,7 +28,7 @@ jobs:
 
     - name: Build
       uses: goreleaser/goreleaser-action@v2
-      if: ! startsWith(github.ref, 'refs/tags/')  
+      if: startsWith(github.ref, 'refs/tags/') == false
       with:
         distribution: goreleaser
         version: latest
