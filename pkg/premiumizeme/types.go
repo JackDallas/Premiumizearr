@@ -1,6 +1,6 @@
 package premiumizeme
 
-type DeleteTransferResponse struct {
+type SimpleResponse struct {
 	Status  string `json:"status"`
 	Message string `json:"message"`
 }
@@ -23,6 +23,38 @@ type CreateTransferResponse struct {
 	Message string `json:"message"`
 }
 
+type CreateFolderResponse struct {
+	Status  string `json:"status"`
+	Message string `json:"message"`
+	ID      string `json:"id"`
+}
+
+type ListFoldersResponse struct {
+	Status   string `json:"status"`
+	Message  string `json:"message"`
+	Content  []Item `json:"content"`
+	Name     string `json:"name"`
+	ParentID string `json:"parent_id"`
+	FolderID string `json:"folder_id"`
+}
+
+type Item struct {
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	Type       string `json:"type"`
+	CreatedAt  int    `json:"created_at"`
+	MimeType   string `json:"mime_type"`
+	Link       string `json:"link"`
+	StreamLink string `json:"stream_link"`
+}
+type FolderItems struct {
+	Status   string `json:"status"`
+	Contant  []Item `json:"content"`
+	Name     string `json:"name"`
+	ParentID string `json:"parent_id"`
+	FolderID string `json:"folder_id"`
+}
+
 type Transfer struct {
 	ID       string  `json:"id"`
 	Name     string  `json:"name"`
@@ -33,3 +65,7 @@ type Transfer struct {
 	FolderID string  `json:"folder_id"`
 	FileID   string  `json:"file_id"`
 }
+
+const (
+	ERROR_FOLDER_ALREADY_EXISTS = "This folder already exists."
+)

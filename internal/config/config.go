@@ -17,15 +17,14 @@ var (
 type Config struct {
 	PremiumizemeAPIKey string `yaml:"PremiumizemeAPIKey"`
 
-	SonarrURL                string `yaml:"SonarrURL"`
-	SonarrAPIKey             string `yaml:"SonarrAPIKey"`
-	SonarrBlackholeDirectory string `yaml:"SonarrBlackholeDirectory"`
-	SonarrDownloadsDirectory string `yaml:"SonarrDownloadsDirectory"`
+	SonarrURL    string `yaml:"SonarrURL"`
+	SonarrAPIKey string `yaml:"SonarrAPIKey"`
 
-	RadarrURL                string `yaml:"RadarrURL"`
-	RadarrAPIKey             string `yaml:"RadarrAPIKey"`
-	RadarrBlackholeDirectory string `yaml:"RadarrBlackholeDirectory"`
-	RadarrDownloadsDirectory string `yaml:"RadarrDownloadsDirectory"`
+	RadarrURL    string `yaml:"RadarrURL"`
+	RadarrAPIKey string `yaml:"RadarrAPIKey"`
+
+	BlackholeDirectory string `yaml:"BlackholeDirectory"`
+	DownloadsDirectory string `yaml:"DownloadsDirectory"`
 
 	BindIP   string `yaml:"bindIP"`
 	BindPort string `yaml:"bindPort"`
@@ -49,17 +48,15 @@ func loadConfigFromDisk() (Config, error) {
 
 func createDefaultConfig() error {
 	config := Config{
-		PremiumizemeAPIKey:       "",
-		SonarrURL:                "http://localhost:8989",
-		SonarrAPIKey:             "",
-		SonarrBlackholeDirectory: "",
-		SonarrDownloadsDirectory: "",
-		RadarrURL:                "http://localhost:7878",
-		RadarrAPIKey:             "",
-		RadarrBlackholeDirectory: "",
-		RadarrDownloadsDirectory: "",
-		BindIP:                   "0.0.0.0",
-		BindPort:                 "8182",
+		PremiumizemeAPIKey: "",
+		SonarrURL:          "http://localhost:8989",
+		SonarrAPIKey:       "",
+		RadarrURL:          "http://localhost:7878",
+		RadarrAPIKey:       "",
+		BlackholeDirectory: "",
+		DownloadsDirectory: "",
+		BindIP:             "0.0.0.0",
+		BindPort:           "8182",
 	}
 
 	file, err := yaml.Marshal(config)

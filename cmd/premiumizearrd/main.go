@@ -6,20 +6,16 @@ import (
 	"os"
 	"time"
 
+	"github.com/jackdallas/premiumizearr/internal/arr"
 	"github.com/jackdallas/premiumizearr/internal/config"
+	"github.com/jackdallas/premiumizearr/internal/service"
+	"github.com/jackdallas/premiumizearr/internal/web_service"
 	"github.com/jackdallas/premiumizearr/pkg/premiumizeme"
-	"github.com/jackdallas/starr"
-	"github.com/jackdallas/starr/sonarr"
 	log "github.com/sirupsen/logrus"
+	"golift.io/starr"
+	"golift.io/starr/radarr"
+	"golift.io/starr/sonarr"
 )
-
-type premiumizearrd struct {
-	Config              *config.Config
-	premiumizearrClient *premiumizeme.Premiumizeme
-	SonarrClient        *sonarr.Sonarr
-	DirectoryWatcher    *DirectoryWatcherService
-	TransferManager     *TransfersManager
-}
 
 func main() {
 	//Flags
@@ -38,14 +34,17 @@ func main() {
 	}
 	log.SetLevel(lvl)
 
-	logFile, err := os.Create("premiumizearr.log")
+	logFile, err := os.OpenFile("premiumizearr.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Error(err)
 	} else {
 		log.SetOutput(io.MultiWriter(logFile, os.Stdout))
 	}
 
-	log.Info("Starting premiumizearr daemon")
+	log.Info("")
+	log.Info("---------- Starting premiumizearr daemon ----------")
+	log.Info("")
+
 	config, err := config.LoadOrCreateConfig(configFile)
 
 	if err != nil {
@@ -56,33 +55,36 @@ func main() {
 		panic("premiumizearr API Key is empty")
 	}
 
-	premiumizearrze_client := premiumizeme.NewPremiumizemeClient(config.PremiumizemeAPIKey)
+	// Initialisation
 
-	starr_config := starr.New(config.SonarrAPIKey, config.SonarrURL, 0)
-	sonarr_client := sonarr.New(starr_config)
+	premiumizearr_client := premiumizeme.NewPremiumizemeClient(config.PremiumizemeAPIKey)
 
-	var premarrd premiumizearrd
+	starr_config_sonarr := starr.New(config.SonarrAPIKey, config.SonarrURL, 0)
+	starr_config_radarr := starr.New(config.RadarrAPIKey, config.RadarrURL, 0)
 
-	transfer_manager := TransfersManager{
-		premiumizearrd: &premarrd,
-		LastUpdated:    time.Now().Unix(),
+	sonarr_wrapper := arr.SonarrArr{
+		Client:     sonarr.New(starr_config_sonarr),
+		History:    nil,
+		LastUpdate: time.Now(),
+	}
+	radarr_wrapper := arr.RadarrArr{
+		Client:     radarr.New(starr_config_radarr),
+		History:    nil,
+		LastUpdate: time.Now(),
 	}
 
-	directory_watcher := DirectoryWatcherService{
-		premiumizearrd: &premarrd,
+	arrs := []arr.IArr{
+		&sonarr_wrapper,
+		&radarr_wrapper,
 	}
 
-	premarrd = premiumizearrd{
-		Config:              &config,
-		premiumizearrClient: premiumizearrze_client,
-		SonarrClient:        sonarr_client,
-		DirectoryWatcher:    &directory_watcher,
-		TransferManager:     &transfer_manager,
-	}
+	transfer_manager := service.NewTransferManagerService(premiumizearr_client, &arrs, &config)
+
+	directory_watcher := service.NewDirectoryWatcherService(premiumizearr_client, &config)
 
 	go directory_watcher.Watch()
 
-	go StartWebServer(&premarrd)
+	go web_service.StartWebServer(&transfer_manager, &directory_watcher, &config)
 	//Block until the program is terminated
-	transfer_manager.Run(1 * time.Minute)
+	transfer_manager.Run(15 * time.Second)
 }

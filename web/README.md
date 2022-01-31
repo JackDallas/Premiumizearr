@@ -1,4 +1,4 @@
-# Premiumize.me Manager UI
+# Premiumizearr UI
 
 - Displays current transfers status'
 - Displays current downloads status'
