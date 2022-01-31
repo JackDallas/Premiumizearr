@@ -18,3 +18,5 @@ build/
 .vscode
 premiumizearrd
 premiumizearrd.exe
+
+dist/
