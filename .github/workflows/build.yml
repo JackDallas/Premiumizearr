@@ -7,7 +7,6 @@ on:
     branches: [ main ]
 
 jobs:
-  # Create all builds for various platforms
   build:
     runs-on: ubuntu-latest
     strategy:
@@ -23,6 +22,13 @@ jobs:
     - name: Confirm Version
       run: go version
 
-    - name: Build 
+    - name: Build
       run: |
         GOOS=${{ matrix.targets.os }} GOARCH=${{ matrix.targets.arch }} make
+        zip Premiumizemed_${{ env.RELEASE_VERSION }}-${{ matrix.targets.os }}-${{ matrix.targets.arch }}.zip build/
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Premiumizemed_${{ env.RELEASE_VERSION }}-${{ matrix.targets.os }}-${{ matrix.targets.arch }}
+        path: Premiumizemed_${{ env.RELEASE_VERSION }}-${{ matrix.targets.os }}-${{ matrix.targets.arch }}.zip
