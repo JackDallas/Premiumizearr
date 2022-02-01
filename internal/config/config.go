@@ -28,6 +28,8 @@ type Config struct {
 
 	BindIP   string `yaml:"bindIP"`
 	BindPort string `yaml:"bindPort"`
+
+	WebRoot string `yaml:"WebRoot"`
 }
 
 func loadConfigFromDisk() (Config, error) {
@@ -57,6 +59,7 @@ func createDefaultConfig() error {
 		DownloadsDirectory: "",
 		BindIP:             "0.0.0.0",
 		BindPort:           "8182",
+		WebRoot:            "",
 	}
 
 	file, err := yaml.Marshal(config)

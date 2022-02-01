@@ -25,8 +25,6 @@ type IndexTemplates struct {
 
 var indexBytes []byte
 
-const webRoot = "premiumizearr"
-
 type server struct {
 	transferManager         *service.TransferManagerService
 	directoryWatcherService *service.DirectoryWatcherService
@@ -40,7 +38,7 @@ func StartWebServer(transferManager *service.TransferManagerService, directoryWa
 	}
 
 	var ibytes bytes.Buffer
-	err = tmpl.Execute(&ibytes, &IndexTemplates{webRoot})
+	err = tmpl.Execute(&ibytes, &IndexTemplates{config.WebRoot})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -53,18 +51,24 @@ func StartWebServer(transferManager *service.TransferManagerService, directoryWa
 	spa := spaHandler{
 		staticPath: "static",
 		indexPath:  "index.html",
+		webRoot:    config.WebRoot,
 	}
 
 	r := mux.NewRouter()
 
-	log.Infof("Creating route: %s", webRoot+"/api/transfers")
-	r.HandleFunc("/"+webRoot+"/api/transfers", s.TransfersHandler)
+	transferPath := "/api/transfers"
+	downloadsPath := "/api/downloads"
+	blackholePath := "/api/blackhole"
 
-	log.Infof("Creating route: %s", webRoot+"/api/downloads")
-	r.HandleFunc("/"+webRoot+"/api/downloads", s.DownloadsHandler)
+	if config.WebRoot != "" {
+		transferPath = path.Join(config.WebRoot, transferPath)
+		downloadsPath = path.Join(config.WebRoot, downloadsPath)
+		blackholePath = path.Join(config.WebRoot, blackholePath)
+	}
 
-	log.Infof("Creating route: %s", webRoot+"/api/blackhole")
-	r.HandleFunc("/"+webRoot+"/api/blackhole", s.BlackholeHandler)
+	r.HandleFunc(transferPath, s.TransfersHandler)
+	r.HandleFunc(downloadsPath, s.DownloadsHandler)
+	r.HandleFunc(blackholePath, s.BlackholeHandler)
 
 	r.PathPrefix("/").Handler(spa)
 
@@ -163,6 +167,7 @@ func (s *server) BlackholeHandler(w http.ResponseWriter, r *http.Request) {
 type spaHandler struct {
 	staticPath string
 	indexPath  string
+	webRoot    string
 }
 
 func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -175,8 +180,9 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	path = strings.Replace(path, webRoot, "", 1)
-
+	if h.webRoot != "" {
+		path = strings.Replace(path, h.webRoot, "", 1)
+	}
 	// prepend the path with the path to the static directory
 	path = filepath.Join(h.staticPath, path)
 
