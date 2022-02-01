@@ -8,15 +8,15 @@
 
 ## Support the project by using my invite code
 
-[Invite Code]("https://www.premiumize.me/ref/446038083")
+[Invite Code](https://www.premiumize.me/ref/446038083)
 
 ## Install
 
-[Grab the latest release artifact links here]]("https://github.com/JackDallas/Premiumizearr/releases/")
+[Grab the latest release artifact links here](https://github.com/JackDallas/Premiumizearr/releases/)
 
 ### Binary
 
-```bash
+```
 wget https://github.com/JackDallas/Premiumizearr/releases/download/x.x.x/Premiumizearr_x.x.x_linux_amd64.tar.gz
 tar xf Premiumizearr_x.x.x.x_linux_amd64.tar.gz
 cd Premiumizearr_x.x.x.x_linux_amd64
@@ -30,7 +30,7 @@ sudo systemctl start premiumizearrd.service
 
 ### deb file
 
-```bash
+```
 wget https://github.com/JackDallas/Premiumizearr/releases/download/x.x.x/premiumizearr_x.x.x._linux_amd64.deb
 sudo dpkg -i premiumizearr_x.x.x.x_linux_amd64.deb
 ```
@@ -42,11 +42,17 @@ sudo dpkg -i premiumizearr_x.x.x.x_linux_amd64.deb
 Edit the config file at `/opt/premiumizearrd/config.yml`
 
 `RadarrURL,SonarrURL` Url the Arr can be accessed on
+
 `RadarrAPIKey,SonarrAPIKey` API key for the Arr
-`PremiumizemeAPIKey` API key for your [premiumize.me]("http://premiumize.me") account
+
+`PremiumizemeAPIKey` API key for your [premiumize.me](https://www.premiumize.me) account
+
 `BlackholeDirectory` Path to Directory the Arr's will put magnet/torrent/nzb files in
+
 `DownloadsDirectory` Path for Premiumizearr to download media files to, that the Arr's watch for new media
+
 `bindIP` IP the web server binds to
+
 `bindPort` Port the web server binds to
 
 ### Sonarr/Radarr
