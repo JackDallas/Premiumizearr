@@ -61,7 +61,7 @@ module.exports = {
 	devServer: {
 		hot: true,
 		proxy: {	
-			'/api': 'https://projectmouseion.com/premiumizearr/api'
+			'/api': 'https://yourinstance.com/api'
 		}
 	},
 	optimization: {

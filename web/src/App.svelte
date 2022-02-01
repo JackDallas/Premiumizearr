@@ -6,7 +6,7 @@
 
   let dlSpeed = 0;
 
-  let webRoot = new URL(window.location.href).pathname;
+  let webRoot = window.location.href;
 
   function parseDLSpeedFromMessage(m) {
     if (m == "Loading..." || m == undefined) return 0;
@@ -37,7 +37,7 @@
         case "GB":
           return speed * 1024 * 1024 * 1024;
         default:
-          console.log("Unknown unit: " + unit);
+          console.log("Unknown unit: " + unit + " in message '" + m + "'");
           return 0;
       }
     }
@@ -106,7 +106,7 @@
             { key: "name", value: "Name", sort: false },
           ]}
           {webRoot}
-          APIpath="/api/blackhole"
+          APIpath="api/blackhole"
           zebra={true}
           totalName="In Queue: "
         />
@@ -122,7 +122,7 @@
           ]}
           updateTimeSeconds={2}
           {webRoot}
-          APIpath="/api/downloads"
+          APIpath="api/downloads"
           zebra={true}
           totalName="Downloading: "
         />
@@ -140,7 +140,7 @@
             { key: "message", value: "Message", sort: false },
           ]}
           {webRoot}
-          APIpath="/api/transfers"
+          APIpath="api/transfers"
           zebra={true}
           {dataToRows}
         />
