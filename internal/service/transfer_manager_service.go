@@ -77,7 +77,7 @@ func (manager *TransferManagerService) TaskUpdateTransfersList() {
 	log.Debug("Running Task UpdateTransfersList")
 	transfers, err := manager.premiumizemeClient.GetTransfers()
 	if err != nil {
-		log.Error(err)
+		log.Error("Error getting transfers: %s", err.Error())
 		return
 	}
 	manager.updateTransfers(transfers)
@@ -109,7 +109,7 @@ func (manager *TransferManagerService) TaskCheckPremiumizeDownloadsFolder() {
 	log.Debug("Running Task CheckPremiumizeDownloadsFolder")
 	items, err := manager.premiumizemeClient.ListFolder(manager.downloadsFolderID)
 	if err != nil {
-		log.Error(err)
+		log.Error("Error listing downloads folder: %s", err.Error())
 		return
 	}
 
@@ -178,7 +178,7 @@ func (manager *TransferManagerService) HandleFinishedItem(item premiumizeme.Item
 		return
 	}
 	if err != nil {
-		log.Error(err)
+		log.Error("Error generating download link: %s", err)
 		manager.removeDownload(item.Name)
 		return
 	}
@@ -230,7 +230,7 @@ func (manager *TransferManagerService) HandleFinishedItem(item premiumizeme.Item
 	err = manager.premiumizemeClient.DeleteFolder(item.ID)
 	if err != nil {
 		manager.removeDownload(item.Name)
-		log.Error(err)
+		log.Error("Error deleting folder on premiumuze.me: %s", err)
 		return
 	}
 

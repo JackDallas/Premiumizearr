@@ -146,7 +146,7 @@ func (dw *DirectoryWatcherService) processUploads() {
 					log.Trace("File already uploaded, removing from Disk")
 					os.Remove(filePath)
 				default:
-					log.Error(err)
+					log.Error("Error creating transfer: %s", err)
 				}
 			} else {
 				dw.status = "Okay"
