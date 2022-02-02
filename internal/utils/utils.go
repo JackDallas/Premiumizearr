@@ -4,9 +4,7 @@ import (
 	"archive/zip"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -21,21 +19,6 @@ func StripDownloadTypesExtention(fileName string) string {
 	}
 
 	return fileName
-}
-
-func GetTempBaseDir() string {
-	return path.Join(os.TempDir(), "premiumizearrd")
-}
-
-func GetTempDir() (string, error) {
-	// Create temp dir in os temp location
-	tempDir := GetTempBaseDir()
-	err := os.Mkdir(tempDir, os.ModePerm)
-	dir, err := ioutil.TempDir(tempDir, "unzip-")
-	if err != nil {
-		return "", err
-	}
-	return dir, nil
 }
 
 // https://golangcode.com/unzip-files-in-go/

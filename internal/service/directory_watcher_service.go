@@ -48,7 +48,7 @@ func (dw *DirectoryWatcherService) Watch() {
 	dw.downloadsFolderID = utils.GetDownloadsFolderIDFromPremiumizeme(dw.premiumizemeClient)
 
 	log.Info("Clearing tmp directory...")
-	tempDir := utils.GetTempBaseDir()
+	tempDir := dw.config.GetTempBaseDir()
 	err := os.RemoveAll(tempDir)
 	if err != nil {
 		log.Errorf("Error clearing tmp directory %s", tempDir)

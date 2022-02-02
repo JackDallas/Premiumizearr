@@ -51,6 +51,8 @@ Edit the config file at `/opt/premiumizearrd/config.yml`
 
 `DownloadsDirectory` Path for Premiumizearr to download media files to, that the Arr's watch for new media
 
+`UnzipDirectory` Path for Premiumizearr to use to temporarily unzip downloads before moving, leave blank and a path in temp will me made
+
 `bindIP` IP the web server binds to
 
 `bindPort` Port the web server binds to

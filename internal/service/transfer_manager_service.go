@@ -184,7 +184,7 @@ func (manager *TransferManagerService) HandleFinishedItem(item premiumizeme.Item
 	}
 	log.Trace("Downloading: ", link)
 
-	tempDir, err := utils.GetTempDir()
+	tempDir, err := manager.config.GetTempDir()
 	if err != nil {
 		log.Errorf("Could not create temp dir: %s", err)
 		manager.removeDownload(item.Name)
