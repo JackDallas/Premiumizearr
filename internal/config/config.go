@@ -4,6 +4,8 @@ import (
 	"errors"
 	"io/ioutil"
 	"log"
+	"os"
+	"path"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -26,6 +28,8 @@ type Config struct {
 	BlackholeDirectory string `yaml:"BlackholeDirectory"`
 	DownloadsDirectory string `yaml:"DownloadsDirectory"`
 
+	UnzipDirectory string `yaml:"UnzipDirectory"`
+
 	BindIP   string `yaml:"bindIP"`
 	BindPort string `yaml:"bindPort"`
 
@@ -42,6 +46,11 @@ func loadConfigFromDisk() (Config, error) {
 
 	err = yaml.Unmarshal(file, &config)
 	if err != nil {
+		data, err := yaml.Marshal(config)
+		if err == nil {
+			//Save config to disk to add missing fields
+			ioutil.WriteFile("config.yaml", data, 0644)
+		}
 		return config, ErrInvalidConfigFile
 	}
 
@@ -57,6 +66,7 @@ func createDefaultConfig() error {
 		RadarrAPIKey:       "",
 		BlackholeDirectory: "",
 		DownloadsDirectory: "",
+		UnzipDirectory:     "",
 		BindIP:             "0.0.0.0",
 		BindPort:           "8182",
 		WebRoot:            "",
@@ -101,4 +111,26 @@ func LoadOrCreateConfig(altConfigLocation string) (Config, error) {
 	}
 
 	return config, nil
+}
+
+func (c *Config) GetTempBaseDir() string {
+	if c.UnzipDirectory != "" {
+		return path.Dir(c.UnzipDirectory)
+	}
+	return path.Join(os.TempDir(), "premiumizearrd")
+}
+
+func (c *Config) GetTempDir() (string, error) {
+	// Create temp dir in os temp location
+	tempDir := c.GetTempBaseDir()
+
+	err := os.MkdirAll(tempDir, os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+	dir, err := ioutil.TempDir(tempDir, "unzip-")
+	if err != nil {
+		return "", err
+	}
+	return dir, nil
 }

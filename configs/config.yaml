@@ -1,9 +1,0 @@
-PremiumizemeAPIKey: ""
-SonarrURL: http://localhost:8989
-SonarrAPIKey: ""
-RadarrURL: http://localhost:7878
-RadarrAPIKey: ""
-BlackholeDirectory: ""
-DownloadsDirectory: ""
-bindIP: 0.0.0.0
-bindPort: "8182"
