@@ -82,3 +82,28 @@ nfpms:
         dst: /etc/systemd/system/premiumizearrd.service
     scripts:
       postinstall: "scripts/postinstall.sh"
+      
+dockers:
+  -
+    goos: linux
+    goarch: amd64
+
+    image_templates:
+    - "gcr.io/jackdallas/premiumizearrd:{{ .Tag }}"
+    - "gcr.io/jackdallas/premiumizearrd:v{{ .Major }}"
+    - "gcr.io/jackdallas/premiumizearrd:v{{ .Major }}.{{ .Minor }}"
+    - "gcr.io/jackdallas/premiumizearrd:latest"
+
+    skip_push: auto
+    use: docker
+
+    build_flag_templates:
+    - "--pull"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.title={{.ProjectName}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--platform=linux/amd64"
+
+    extra_files:
+    - build/static/
