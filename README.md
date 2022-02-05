@@ -41,9 +41,15 @@ sudo dpkg -i premiumizearr_x.x.x.x_linux_amd64.deb
 
 Edit the config file at `/opt/premiumizearrd/config.yml`
 
-`RadarrURL,SonarrURL` Url the Arr can be accessed on
+`Arrs:` A list of *Arr clients you wish to connect to in the format`
+    ```yaml
+    - Name: "Sonarr 1"
+      URL: http://127.0.0.1:8989
+      APIKey: xxxxxxx
+      Type: Sonarr
+    ```
 
-`RadarrAPIKey,SonarrAPIKey` API key for the Arr
+Note: Type is either `Sonarr` or `Radarr` with a capital letter 
 
 `PremiumizemeAPIKey` API key for your [premiumize.me](https://www.premiumize.me) account
 
