@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path"
-	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -16,14 +15,34 @@ var (
 	ErrFailedToFindConfigFile = errors.New("failed to find config file")
 )
 
+//ArrType enum for Sonarr/Radarr
+type ArrType string
+
+const (
+	Sonarr ArrType = "Sonarr"
+	Radarr ArrType = "Radarr"
+)
+
+type ArrConfig struct {
+	Name   string  `yaml:"Name"`
+	URL    string  `yaml:"URL"`
+	APIKey string  `yaml:"APIKey"`
+	Type   ArrType `yaml:"Type"`
+}
+
 type Config struct {
 	PremiumizemeAPIKey string `yaml:"PremiumizemeAPIKey"`
 
-	SonarrURL    string `yaml:"SonarrURL"`
+	//@deprecated
+	SonarrURL string `yaml:"SonarrURL"`
+	//@deprecated
 	SonarrAPIKey string `yaml:"SonarrAPIKey"`
-
-	RadarrURL    string `yaml:"RadarrURL"`
+	//@deprecated
+	RadarrURL string `yaml:"RadarrURL"`
+	//@deprecated
 	RadarrAPIKey string `yaml:"RadarrAPIKey"`
+
+	Arrs []ArrConfig `yaml:"Arrs"`
 
 	BlackholeDirectory string `yaml:"BlackholeDirectory"`
 	DownloadsDirectory string `yaml:"DownloadsDirectory"`
@@ -46,12 +65,36 @@ func loadConfigFromDisk() (Config, error) {
 
 	err = yaml.Unmarshal(file, &config)
 	if err != nil {
-		data, err := yaml.Marshal(config)
-		if err == nil {
-			//Save config to disk to add missing fields
-			ioutil.WriteFile("config.yaml", data, 0644)
-		}
 		return config, ErrInvalidConfigFile
+	}
+
+	// Move sonarr and radarr details to the new array
+	if config.SonarrURL != "" && config.SonarrAPIKey != "" {
+		config.Arrs = append(config.Arrs, ArrConfig{
+			Name:   "Sonarr (Imported)",
+			URL:    config.SonarrURL,
+			APIKey: config.SonarrAPIKey,
+			Type:   Sonarr,
+		})
+		config.SonarrURL = ""
+		config.SonarrAPIKey = ""
+	}
+
+	if config.RadarrURL != "" && config.RadarrAPIKey != "" {
+		config.Arrs = append(config.Arrs, ArrConfig{
+			Name:   "Radarr (Imported)",
+			URL:    config.RadarrURL,
+			APIKey: config.RadarrAPIKey,
+			Type:   Radarr,
+		})
+		config.RadarrURL = ""
+		config.RadarrAPIKey = ""
+	}
+
+	data, err := yaml.Marshal(config)
+	if err == nil {
+		//Save config to disk to add missing fields
+		ioutil.WriteFile("config.yaml", data, 0644)
 	}
 
 	return config, nil
@@ -59,11 +102,11 @@ func loadConfigFromDisk() (Config, error) {
 
 func createDefaultConfig() error {
 	config := Config{
-		PremiumizemeAPIKey: "",
-		SonarrURL:          "http://localhost:8989",
-		SonarrAPIKey:       "",
-		RadarrURL:          "http://localhost:7878",
-		RadarrAPIKey:       "",
+		PremiumizemeAPIKey: "xxxxxxxxx",
+		Arrs: []ArrConfig{
+			{URL: "http://localhost:8989", APIKey: "xxxxxxxxx", Type: Sonarr},
+			{URL: "http://localhost:7878", APIKey: "xxxxxxxxx", Type: Radarr},
+		},
 		BlackholeDirectory: "",
 		DownloadsDirectory: "",
 		UnzipDirectory:     "",
@@ -104,10 +147,6 @@ func LoadOrCreateConfig(altConfigLocation string) (Config, error) {
 		if err == ErrInvalidConfigFile {
 			return config, ErrInvalidConfigFile
 		}
-	}
-	//Clean up url
-	if strings.HasSuffix(config.SonarrURL, ("/")) {
-		config.SonarrURL = config.SonarrURL[:len(config.SonarrURL)-1]
 	}
 
 	return config, nil

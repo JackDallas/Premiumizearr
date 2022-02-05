@@ -18,6 +18,7 @@ type IArr interface {
 }
 
 type SonarrArr struct {
+	Name                 string
 	ClientMutex          sync.Mutex
 	Client               *sonarr.Sonarr
 	HistoryMutex         sync.Mutex
@@ -29,6 +30,7 @@ type SonarrArr struct {
 }
 
 type RadarrArr struct {
+	Name                 string
 	ClientMutex          sync.Mutex
 	Client               *radarr.Radarr
 	HistoryMutex         sync.Mutex

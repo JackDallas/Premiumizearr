@@ -86,23 +86,31 @@ func main() {
 
 	premiumizearr_client := premiumizeme.NewPremiumizemeClient(config.PremiumizemeAPIKey)
 
-	starr_config_sonarr := starr.New(config.SonarrAPIKey, config.SonarrURL, 0)
-	starr_config_radarr := starr.New(config.RadarrAPIKey, config.RadarrURL, 0)
+	arrs := []arr.IArr{}
 
-	sonarr_wrapper := arr.SonarrArr{
-		Client:     sonarr.New(starr_config_sonarr),
-		History:    nil,
-		LastUpdate: time.Now(),
-	}
-	radarr_wrapper := arr.RadarrArr{
-		Client:     radarr.New(starr_config_radarr),
-		History:    nil,
-		LastUpdate: time.Now(),
-	}
-
-	arrs := []arr.IArr{
-		&sonarr_wrapper,
-		&radarr_wrapper,
+	for _, arr_config := range config.Arrs {
+		switch arr_config.Type {
+		case "Sonarr":
+			config := starr.New(arr_config.APIKey, arr_config.URL, 0)
+			wrapper := arr.SonarrArr{
+				Name:       arr_config.Name,
+				Client:     sonarr.New(config),
+				History:    nil,
+				LastUpdate: time.Now(),
+			}
+			arrs = append(arrs, &wrapper)
+		case "Radarr":
+			config := starr.New(arr_config.APIKey, arr_config.URL, 0)
+			wrapper := arr.RadarrArr{
+				Name:       arr_config.Name,
+				Client:     radarr.New(config),
+				History:    nil,
+				LastUpdate: time.Now(),
+			}
+			arrs = append(arrs, &wrapper)
+		default:
+			log.Error("Unknown arr type: %s, not adding Arr %s", arr_config.Type, arr_config.Name)
+		}
 	}
 
 	transfer_manager := service.NewTransferManagerService(premiumizearr_client, &arrs, &config)
