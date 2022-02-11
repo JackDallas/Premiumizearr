@@ -89,10 +89,10 @@ dockers:
     goarch: amd64
 
     image_templates:
-    - "gcr.io/jackdallas/premiumizearrd:{{ .Tag }}"
-    - "gcr.io/jackdallas/premiumizearrd:v{{ .Major }}"
-    - "gcr.io/jackdallas/premiumizearrd:v{{ .Major }}.{{ .Minor }}"
-    - "gcr.io/jackdallas/premiumizearrd:latest"
+    - "ghcr.io/jackdallas/premiumizearr:{{ .Tag }}"
+    - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}"
+    - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}.{{ .Minor }}"
+    - "ghcr.io/jackdallas/premiumizearr:latest"
 
     skip_push: auto
     use: docker
