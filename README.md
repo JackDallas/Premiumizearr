@@ -35,6 +35,14 @@ wget https://github.com/JackDallas/Premiumizearr/releases/download/x.x.x/premium
 sudo dpkg -i premiumizearr_x.x.x.x_linux_amd64.deb
 ```
 
+### Docker
+
+[Docker images are listed here](https://github.com/jackdallas/Premiumizearr/pkgs/container/premiumizearr)
+
+`docker run ghcr.io/jackdallas/premiumizearr:latest /host/config.yaml:/opt/app/config.yaml -v /host/downloads:/downloads -v /host/blackhole:/blackhole`
+
+You'll need to then point your config at `/blackhole` and `/downloads` (config explained more below)
+
 ## Setup
 
 ### Premiumizearrd
@@ -42,7 +50,8 @@ sudo dpkg -i premiumizearr_x.x.x.x_linux_amd64.deb
 Edit the config file at `/opt/premiumizearrd/config.yml`
 
 `Arrs:` A list of *Arr clients you wish to connect to in the format`
-    ```yaml
+
+    ```
     - Name: "Sonarr 1"
       URL: http://127.0.0.1:8989
       APIKey: xxxxxxx
