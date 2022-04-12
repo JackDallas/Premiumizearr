@@ -1,0 +1,16 @@
+PremiumizemeAPIKey: xxxxxxxxx
+Arrs:
+- Name: ""
+  URL: http://localhost:8989
+  APIKey: xxxxxxxxx
+  Type: Sonarr
+- Name: ""
+  URL: http://localhost:7878
+  APIKey: xxxxxxxxx
+  Type: Radarr
+BlackholeDirectory: ""
+DownloadsDirectory: ""
+UnzipDirectory: ""
+bindIP: 0.0.0.0
+bindPort: "8182"
+WebRoot: ""
