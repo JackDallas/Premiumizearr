@@ -33,15 +33,6 @@ type ArrConfig struct {
 type Config struct {
 	PremiumizemeAPIKey string `yaml:"PremiumizemeAPIKey"`
 
-	//@deprecated
-	SonarrURL string `yaml:"SonarrURL"`
-	//@deprecated
-	SonarrAPIKey string `yaml:"SonarrAPIKey"`
-	//@deprecated
-	RadarrURL string `yaml:"RadarrURL"`
-	//@deprecated
-	RadarrAPIKey string `yaml:"RadarrAPIKey"`
-
 	Arrs []ArrConfig `yaml:"Arrs"`
 
 	BlackholeDirectory string `yaml:"BlackholeDirectory"`
@@ -66,29 +57,6 @@ func loadConfigFromDisk() (Config, error) {
 	err = yaml.Unmarshal(file, &config)
 	if err != nil {
 		return config, ErrInvalidConfigFile
-	}
-
-	// Move sonarr and radarr details to the new array
-	if config.SonarrURL != "" && config.SonarrAPIKey != "" {
-		config.Arrs = append(config.Arrs, ArrConfig{
-			Name:   "Sonarr (Imported)",
-			URL:    config.SonarrURL,
-			APIKey: config.SonarrAPIKey,
-			Type:   Sonarr,
-		})
-		config.SonarrURL = ""
-		config.SonarrAPIKey = ""
-	}
-
-	if config.RadarrURL != "" && config.RadarrAPIKey != "" {
-		config.Arrs = append(config.Arrs, ArrConfig{
-			Name:   "Radarr (Imported)",
-			URL:    config.RadarrURL,
-			APIKey: config.RadarrAPIKey,
-			Type:   Radarr,
-		})
-		config.RadarrURL = ""
-		config.RadarrAPIKey = ""
 	}
 
 	data, err := yaml.Marshal(config)
