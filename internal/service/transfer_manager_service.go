@@ -179,78 +179,78 @@ func (manager *TransferManagerService) HandleFinishedItem(item premiumizeme.Item
 	}
 
 	manager.addDownload(&item)
-	//Create entry in downloads map to lock item
-	// manager.downloadList[item.Name] = progress_downloader.NewWriteCounter()
 
-	log.Debug("Downloading: ", item.Name)
-	log.Tracef("%+v", item)
-	var link string
-	var err error
-	if item.Type == "file" {
-		link, err = manager.premiumizemeClient.GenerateZippedFileLink(item.ID)
-	} else if item.Type == "folder" {
-		link, err = manager.premiumizemeClient.GenerateZippedFolderLink(item.ID)
-	} else {
-		log.Errorf("Item is not of type 'file' or 'folder' !! Can't download %s", item.Name)
-		return
-	}
-	if err != nil {
-		log.Error("Error generating download link: %s", err)
+	go func() {
+		log.Debug("Downloading: ", item.Name)
+		log.Tracef("%+v", item)
+		var link string
+		var err error
+		if item.Type == "file" {
+			link, err = manager.premiumizemeClient.GenerateZippedFileLink(item.ID)
+		} else if item.Type == "folder" {
+			link, err = manager.premiumizemeClient.GenerateZippedFolderLink(item.ID)
+		} else {
+			log.Errorf("Item is not of type 'file' or 'folder' !! Can't download %s", item.Name)
+			return
+		}
+		if err != nil {
+			log.Error("Error generating download link: %s", err)
+			manager.removeDownload(item.Name)
+			return
+		}
+		log.Trace("Downloading: ", link)
+
+		tempDir, err := manager.config.GetTempDir()
+		if err != nil {
+			log.Errorf("Could not create temp dir: %s", err)
+			manager.removeDownload(item.Name)
+			return
+		}
+
+		splitString := strings.Split(link, "/")
+		savePath := path.Join(tempDir, splitString[len(splitString)-1])
+		log.Trace("Downloading to: ", savePath)
+
+		out, err := os.Create(savePath)
+		if err != nil {
+			log.Errorf("Could not create save path: %s", err)
+			manager.removeDownload(item.Name)
+			return
+		}
+		defer out.Close()
+
+		err = progress_downloader.DownloadFile(link, savePath, manager.downloadList[item.Name].ProgressDownloader)
+
+		if err != nil {
+			log.Errorf("Could not download file: %s", err)
+			manager.removeDownload(item.Name)
+			return
+		}
+
+		log.Tracef("Unzipping %s to %s", savePath, downloadDirectory)
+		err = utils.Unzip(savePath, downloadDirectory)
+		if err != nil {
+			log.Errorf("Could not unzip file: %s", err)
+			manager.removeDownload(item.Name)
+			return
+		}
+
+		log.Tracef("Removing zip %s from system", savePath)
+		err = os.RemoveAll(savePath)
+		if err != nil {
+			manager.removeDownload(item.Name)
+			log.Errorf("Could not remove zip: %s", err)
+			return
+		}
+
+		err = manager.premiumizemeClient.DeleteFolder(item.ID)
+		if err != nil {
+			manager.removeDownload(item.Name)
+			log.Error("Error deleting folder on premiumuze.me: %s", err)
+			return
+		}
+
+		//Remove download entry from downloads map
 		manager.removeDownload(item.Name)
-		return
-	}
-	log.Trace("Downloading: ", link)
-
-	tempDir, err := manager.config.GetTempDir()
-	if err != nil {
-		log.Errorf("Could not create temp dir: %s", err)
-		manager.removeDownload(item.Name)
-		return
-	}
-
-	splitString := strings.Split(link, "/")
-	savePath := path.Join(tempDir, splitString[len(splitString)-1])
-	log.Trace("Downloading to: ", savePath)
-
-	out, err := os.Create(savePath)
-	if err != nil {
-		log.Errorf("Could not create save path: %s", err)
-		manager.removeDownload(item.Name)
-		return
-	}
-	defer out.Close()
-
-	err = progress_downloader.DownloadFile(link, savePath, manager.downloadList[item.Name].ProgressDownloader)
-
-	if err != nil {
-		log.Errorf("Could not download file: %s", err)
-		manager.removeDownload(item.Name)
-		return
-	}
-
-	log.Tracef("Unzipping %s to %s", savePath, downloadDirectory)
-	err = utils.Unzip(savePath, downloadDirectory)
-	if err != nil {
-		log.Errorf("Could not unzip file: %s", err)
-		manager.removeDownload(item.Name)
-		return
-	}
-
-	log.Tracef("Removing zip %s from system", savePath)
-	err = os.RemoveAll(savePath)
-	if err != nil {
-		manager.removeDownload(item.Name)
-		log.Errorf("Could not remove zip: %s", err)
-		return
-	}
-
-	err = manager.premiumizemeClient.DeleteFolder(item.ID)
-	if err != nil {
-		manager.removeDownload(item.Name)
-		log.Error("Error deleting folder on premiumuze.me: %s", err)
-		return
-	}
-
-	//Remove download entry from downloads map
-	manager.removeDownload(item.Name)
+	}()
 }
