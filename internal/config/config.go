@@ -44,6 +44,8 @@ type Config struct {
 	BindPort string `yaml:"bindPort"`
 
 	WebRoot string `yaml:"WebRoot"`
+
+	SimultaneousDownloads int `yaml:"SimultaneousDownloads"`
 }
 
 func loadConfigFromDisk() (Config, error) {
@@ -75,12 +77,13 @@ func createDefaultConfig() error {
 			{URL: "http://localhost:8989", APIKey: "xxxxxxxxx", Type: Sonarr},
 			{URL: "http://localhost:7878", APIKey: "xxxxxxxxx", Type: Radarr},
 		},
-		BlackholeDirectory: "",
-		DownloadsDirectory: "",
-		UnzipDirectory:     "",
-		BindIP:             "0.0.0.0",
-		BindPort:           "8182",
-		WebRoot:            "",
+		BlackholeDirectory:    "",
+		DownloadsDirectory:    "",
+		UnzipDirectory:        "",
+		BindIP:                "0.0.0.0",
+		BindPort:              "8182",
+		WebRoot:               "",
+		SimultaneousDownloads: 5,
 	}
 
 	file, err := yaml.Marshal(config)
