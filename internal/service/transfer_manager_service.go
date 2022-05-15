@@ -108,24 +108,20 @@ func (manager *TransferManagerService) TaskUpdateTransfersList() {
 func (manager *TransferManagerService) TaskCheckPremiumizeDownloadsFolder() {
 	log.Debug("Running Task CheckPremiumizeDownloadsFolder")
 
-	if manager.countDownloads() < manager.config.SimultaneousDownloads {
-		items, err := manager.premiumizemeClient.ListFolder(manager.downloadsFolderID)
-		if err != nil {
-			log.Error("Error listing downloads folder: %s", err.Error())
-			return
-		}
+	items, err := manager.premiumizemeClient.ListFolder(manager.downloadsFolderID)
+	if err != nil {
+		log.Error("Error listing downloads folder: %s", err.Error())
+		return
+	}
 
-		for _, item := range items {
-			if manager.countDownloads() < manager.config.SimultaneousDownloads {
-				log.Debugf("Processing completed item: %s", item.Name)
-				manager.HandleFinishedItem(item, manager.config.DownloadsDirectory)
-			} else {
-				log.Debugf("Not processing any more transfers, %d are running and cap is %d", manager.countDownloads(), manager.config.SimultaneousDownloads)
-				break
-			}
+	for _, item := range items {
+		if manager.countDownloads() < manager.config.SimultaneousDownloads {
+			log.Debugf("Processing completed item: %s", item.Name)
+			manager.HandleFinishedItem(item, manager.config.DownloadsDirectory)
+		} else {
+			log.Debugf("Not processing any more transfers, %d are running and cap is %d", manager.countDownloads(), manager.config.SimultaneousDownloads)
+			break
 		}
-	} else {
-		log.Debugf("Not checking downloads folder, %d transfers are running and cap is %d", manager.countDownloads(), manager.config.SimultaneousDownloads)
 	}
 }
 
@@ -171,7 +167,7 @@ func (manager *TransferManagerService) downloadExists(itemName string) bool {
 	return false
 }
 
-// Ran in a goroutine
+// Returns when the download has been added to the list
 func (manager *TransferManagerService) HandleFinishedItem(item premiumizeme.Item, downloadDirectory string) {
 	if manager.downloadExists(item.Name) {
 		log.Tracef("Transfer %s is already downloading", item.Name)
