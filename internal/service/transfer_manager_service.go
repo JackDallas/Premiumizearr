@@ -120,6 +120,7 @@ func (manager *TransferManagerService) TaskCheckPremiumizeDownloadsFolder() {
 				log.Debugf("Processing completed item: %s", item.Name)
 				manager.HandleFinishedItem(item, manager.config.DownloadsDirectory)
 			} else {
+				log.Debugf("Not processing any more transfers, %d are running and cap is %d", manager.countDownloads(), manager.config.SimultaneousDownloads)
 				break
 			}
 		}
