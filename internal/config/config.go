@@ -61,6 +61,8 @@ func loadConfigFromDisk() (Config, error) {
 		return config, ErrInvalidConfigFile
 	}
 
+	config = versionUpdateConfig(config)
+
 	data, err := yaml.Marshal(config)
 	if err == nil {
 		//Save config to disk to add missing fields
@@ -68,6 +70,15 @@ func loadConfigFromDisk() (Config, error) {
 	}
 
 	return config, nil
+}
+
+func versionUpdateConfig(config Config) Config {
+	// 1.1.3
+	if config.SimultaneousDownloads == 0 {
+		config.SimultaneousDownloads = 5
+	}
+
+	return config
 }
 
 func createDefaultConfig() error {
