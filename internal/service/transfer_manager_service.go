@@ -120,7 +120,7 @@ func (manager *TransferManagerService) TaskCheckPremiumizeDownloadsFolder() {
 			go manager.HandleFinishedItem(item, manager.config.DownloadsDirectory)
 		}
 	} else {
-		log.Debug("Hit download cap, skipping task")
+		log.Debugf("Not checking downloads folder, %d transfers are running and cap is %d", len(manager.transfers), manager.config.SimultaneousDownloads)
 	}
 }
 
