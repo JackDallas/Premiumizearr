@@ -118,7 +118,7 @@ func (manager *TransferManagerService) TaskCheckPremiumizeDownloadsFolder() {
 		for _, item := range items {
 			if manager.countDownloads() < manager.config.SimultaneousDownloads {
 				log.Debugf("Processing completed item: %s", item.Name)
-				go manager.HandleFinishedItem(item, manager.config.DownloadsDirectory)
+				manager.HandleFinishedItem(item, manager.config.DownloadsDirectory)
 			} else {
 				break
 			}
