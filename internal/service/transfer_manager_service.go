@@ -107,15 +107,20 @@ func (manager *TransferManagerService) TaskUpdateTransfersList() {
 
 func (manager *TransferManagerService) TaskCheckPremiumizeDownloadsFolder() {
 	log.Debug("Running Task CheckPremiumizeDownloadsFolder")
-	items, err := manager.premiumizemeClient.ListFolder(manager.downloadsFolderID)
-	if err != nil {
-		log.Error("Error listing downloads folder: %s", err.Error())
-		return
-	}
 
-	for _, item := range items {
-		log.Debugf("Processing completed item: %s", item.Name)
-		go manager.HandleFinishedItem(item, manager.config.DownloadsDirectory)
+	if len(manager.transfers) < manager.config.SimultaneousDownloads {
+		items, err := manager.premiumizemeClient.ListFolder(manager.downloadsFolderID)
+		if err != nil {
+			log.Error("Error listing downloads folder: %s", err.Error())
+			return
+		}
+
+		for _, item := range items {
+			log.Debugf("Processing completed item: %s", item.Name)
+			go manager.HandleFinishedItem(item, manager.config.DownloadsDirectory)
+		}
+	} else {
+		log.Debug("Hit download cap, skipping task")
 	}
 }
 
