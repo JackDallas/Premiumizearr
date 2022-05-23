@@ -109,3 +109,11 @@ func GetDownloadsFolderIDFromPremiumizeme(premiumizemeClient *premiumizeme.Premi
 
 	return downloadsFolderID
 }
+
+func EnvOrDefault(envName string, defaultValue string) string {
+	envValue := os.Getenv(envName)
+	if len(envValue) == 0 {
+		return defaultValue
+	}
+	return envValue
+}
