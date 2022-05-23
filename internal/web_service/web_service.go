@@ -145,12 +145,15 @@ func (s *server) DownloadsHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *server) BlackholeHandler(w http.ResponseWriter, r *http.Request) {
 	var resp BlackholeResponse
-	for i, n := range s.directoryWatcherService.Queue.GetQueue() {
-		name := path.Base(n)
-		resp.BlackholeFiles = append(resp.BlackholeFiles, BlackholeFile{
-			ID:   i,
-			Name: name,
-		})
+	queue := s.directoryWatcherService.Queue.GetQueue()
+	if len(queue) > 0 {
+		for i, n := range queue {
+			name := path.Base(n)
+			resp.BlackholeFiles = append(resp.BlackholeFiles, BlackholeFile{
+				ID:   i,
+				Name: name,
+			})
+		}
 	}
 	resp.Status = s.directoryWatcherService.GetStatus()
 
