@@ -7,6 +7,7 @@ import (
 	"github.com/jackdallas/premiumizearr/internal/arr"
 	"github.com/jackdallas/premiumizearr/internal/config"
 	"github.com/jackdallas/premiumizearr/internal/service"
+	"github.com/jackdallas/premiumizearr/internal/utils"
 	"github.com/jackdallas/premiumizearr/internal/web_service"
 	"github.com/jackdallas/premiumizearr/pkg/premiumizeme"
 	"github.com/orandin/lumberjackrus"
@@ -22,8 +23,8 @@ func main() {
 	var configFile string
 
 	//Parse flags
-	flag.StringVar(&logLevel, "log", "info", "Logging level: \n \tinfo,debug,trace")
-	flag.StringVar(&configFile, "config", "", "Config file path")
+	flag.StringVar(&logLevel, "log", utils.EnvOrDefault("PREMIUMIZEARR_LOG_LEVEL", "info"), "Logging level: \n \tinfo,debug,trace")
+	flag.StringVar(&configFile, "config", utils.EnvOrDefault("PREMIUMIZEARR_CONFIG_PATH", ""), "Config file path")
 	flag.Parse()
 
 	lvl, err := log.ParseLevel(logLevel)
