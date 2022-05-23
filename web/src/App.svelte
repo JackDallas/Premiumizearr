@@ -10,6 +10,8 @@
 
   function parseDLSpeedFromMessage(m) {
     if (m == "Loading..." || m == undefined) return 0;
+    if (m == "too many missing articles") return 0;
+    
     let speed = m.split(" ")[0];
     speed = speed.replace(",", "");
     let unit = m.split(" ")[1];
