@@ -13,9 +13,14 @@ builds:
     goarch:
       - amd64
       - arm64
+      - arm
+    goarm:
+      - 7
     ignore:
       - goos: windows
         goarch: arm64
+      - goos: windows
+        goarch: arm
 
 archives:
   - format_overrides:
@@ -31,51 +36,32 @@ archives:
       - src: build/static/*
         dst: static
         strip_parent: true
+
 checksum:
   name_template: 'checksums.txt'
+
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
+
 changelog:
   sort: asc
   filters:
     exclude:
       - '^docs:'
       - '^test:'
+
 nfpms:
-  # note that this is an array of nfpm configs
   -
-    # Name of the package.
-    # Defaults to `ProjectName`.
     package_name: premiumizearr
-
     bindir: /opt/premiumizearrd
-
-    # Your app's vendor.
-    # Default is empty.
     vendor: Jack Dallas.
-
-    # Template to your app's homepage.
-    # Default is empty.
     homepage: https://github.com/JackDallas/Premiumizearr
-
-    # Your app's maintainer (probably you).
-    # Default is empty.
     maintainer: Dallas <jack-dallas@outlook.com>
-
-    # Template to your app's description.
-    # Default is empty.
     description: Service to connect premiumize.me to Arr clients.
-
-    # Your app's license.
-    # Default is empty.
     license: GPLv3
-
-    # Formats to be generated.
     formats:
       - deb
-
     contents:
-      # Basic file that applies to all packagers
       - src: build/static/*
         dst: /opt/premiumizearrd/static/
       - src: init/premiumizearrd.service
@@ -85,18 +71,15 @@ nfpms:
       
 dockers:
   -
+    use: docker
     goos: linux
     goarch: amd64
-
     image_templates:
     - "ghcr.io/jackdallas/premiumizearr:{{ .Tag }}"
     - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}"
     - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}.{{ .Minor }}"
     - "ghcr.io/jackdallas/premiumizearr:latest"
-
     skip_push: auto
-    use: docker
-
     build_flag_templates:
     - "--pull"
     - "--label=org.opencontainers.image.created={{.Date}}"
@@ -104,6 +87,44 @@ dockers:
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
     - "--label=org.opencontainers.image.version={{.Version}}"
     - "--platform=linux/amd64"
-
+    extra_files:
+    - build/static/
+  -
+    use: buildx
+    goos: linux
+    goarch: arm64
+    image_templates:
+    - "ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-arm64"
+    - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}-arm64"
+    - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}.{{ .Minor }}-arm64"
+    - "ghcr.io/jackdallas/premiumizearr:latest-arm64"
+    skip_push: auto
+    build_flag_templates:
+    - "--pull"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.title={{.ProjectName}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--platform=linux/arm64"
+    extra_files:
+    - build/static/
+  -
+    use: buildx
+    goos: linux
+    goarch: arm
+    goarm: 7
+    image_templates:
+    - "ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-armv7"
+    - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}-armv7"
+    - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}.{{ .Minor }}-armv7"
+    - "ghcr.io/jackdallas/premiumizearr:latest-armv7"
+    skip_push: auto
+    build_flag_templates:
+    - "--pull"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.title={{.ProjectName}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--platform=linux/arm/v7"
     extra_files:
     - build/static/
