@@ -124,15 +124,19 @@ type DownloadsResponse struct {
 func (s *server) DownloadsHandler(w http.ResponseWriter, r *http.Request) {
 	var resp DownloadsResponse
 
-	for _, v := range s.transferManager.GetDownloads() {
-		resp.Downloads = append(resp.Downloads, Download{
-			Added:    v.Added.Unix(),
-			Name:     v.Name,
-			Progress: v.ProgressDownloader.GetProgress(),
-			Speed:    v.ProgressDownloader.GetSpeed(),
-		})
+	if s.transferManager == nil {
+		resp.Status = "Not Initialized"
+	} else {
+		for _, v := range s.transferManager.GetDownloads() {
+			resp.Downloads = append(resp.Downloads, Download{
+				Added:    v.Added.Unix(),
+				Name:     v.Name,
+				Progress: v.ProgressDownloader.GetProgress(),
+				Speed:    v.ProgressDownloader.GetSpeed(),
+			})
+		}
+		resp.Status = ""
 	}
-	resp.Status = ""
 
 	data, err := json.Marshal(resp)
 	if err != nil {
@@ -145,17 +149,20 @@ func (s *server) DownloadsHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *server) BlackholeHandler(w http.ResponseWriter, r *http.Request) {
 	var resp BlackholeResponse
-	queue := s.directoryWatcherService.Queue.GetQueue()
-	if len(queue) > 0 {
-		for i, n := range queue {
+
+	if s.directoryWatcherService == nil {
+		resp.Status = "Not Initialized"
+	} else {
+		for i, n := range s.directoryWatcherService.Queue.GetQueue() {
 			name := path.Base(n)
 			resp.BlackholeFiles = append(resp.BlackholeFiles, BlackholeFile{
 				ID:   i,
 				Name: name,
 			})
 		}
+
+		resp.Status = s.directoryWatcherService.GetStatus()
 	}
-	resp.Status = s.directoryWatcherService.GetStatus()
 
 	data, err := json.Marshal(resp)
 	if err != nil {
