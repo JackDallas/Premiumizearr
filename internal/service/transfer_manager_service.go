@@ -77,7 +77,7 @@ func (manager *TransferManagerService) TaskUpdateTransfersList() {
 	log.Debug("Running Task UpdateTransfersList")
 	transfers, err := manager.premiumizemeClient.GetTransfers()
 	if err != nil {
-		log.Error("Error getting transfers: %s", err.Error())
+		log.Errorf("Error getting transfers: %s", err.Error())
 		return
 	}
 	manager.updateTransfers(transfers)
@@ -97,7 +97,7 @@ func (manager *TransferManagerService) TaskUpdateTransfersList() {
 				}
 				log.Tracef("Found %s in %s history", transfer.Name, arr.GetArrName())
 				found = true
-				log.Debugf("Processing transfer that has errored: ", transfer.Name)
+				log.Debugf("Processing transfer that has errored: %s", transfer.Name)
 				go arr.HandleErrorTransfer(&transfer, arrID, manager.premiumizemeClient)
 
 			}
@@ -110,7 +110,7 @@ func (manager *TransferManagerService) TaskCheckPremiumizeDownloadsFolder() {
 
 	items, err := manager.premiumizemeClient.ListFolder(manager.downloadsFolderID)
 	if err != nil {
-		log.Error("Error listing downloads folder: %s", err.Error())
+		log.Errorf("Error listing downloads folder: %s", err.Error())
 		return
 	}
 
