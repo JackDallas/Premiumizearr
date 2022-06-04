@@ -7,7 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jackdallas/premiumizearr/internal/arr"
 	"github.com/jackdallas/premiumizearr/internal/config"
 	"github.com/jackdallas/premiumizearr/internal/progress_downloader"
 	"github.com/jackdallas/premiumizearr/internal/utils"
@@ -23,7 +22,7 @@ type DownloadDetails struct {
 
 type TransferManagerService struct {
 	premiumizemeClient *premiumizeme.Premiumizeme
-	arrs               *[]arr.IArr
+	arrsManager        *ArrsManagerService
 	config             *config.Config
 	lastUpdated        int64
 	transfers          []premiumizeme.Transfer
@@ -34,19 +33,29 @@ type TransferManagerService struct {
 	downloadsFolderID  string
 }
 
-func NewTransferManagerService(pme *premiumizeme.Premiumizeme, arrs *[]arr.IArr, config *config.Config) TransferManagerService {
-	return TransferManagerService{
-		premiumizemeClient: pme,
-		arrs:               arrs,
-		config:             config,
-		lastUpdated:        time.Now().Unix(),
-		transfers:          make([]premiumizeme.Transfer, 0),
-		runningTask:        false,
-		downloadListMutex:  &sync.Mutex{},
-		downloadList:       make(map[string]*DownloadDetails, 0),
-		status:             "",
-		downloadsFolderID:  "",
-	}
+// Handle
+func (t TransferManagerService) New() TransferManagerService {
+	t.premiumizemeClient = nil
+	t.arrsManager = nil
+	t.config = nil
+	t.lastUpdated = time.Now().Unix()
+	t.transfers = make([]premiumizeme.Transfer, 0)
+	t.runningTask = false
+	t.downloadListMutex = &sync.Mutex{}
+	t.downloadList = make(map[string]*DownloadDetails, 0)
+	t.status = ""
+	t.downloadsFolderID = ""
+	return t
+}
+
+func (t *TransferManagerService) Init(pme *premiumizeme.Premiumizeme, arrsManager *ArrsManagerService, config *config.Config) {
+	t.premiumizemeClient = pme
+	t.arrsManager = arrsManager
+	t.config = config
+}
+
+func (manager *TransferManagerService) ConfigUpdatedCallback(currentConfig config.Config, newConfig config.Config) {
+	//All config access is dynamic currently, function kept for potential future use
 }
 
 func (manager *TransferManagerService) Run(interval time.Duration) {
@@ -54,7 +63,6 @@ func (manager *TransferManagerService) Run(interval time.Duration) {
 	for {
 		manager.runningTask = true
 		manager.TaskUpdateTransfersList()
-		//TODO: Seperate loop maybe
 		manager.TaskCheckPremiumizeDownloadsFolder()
 		manager.runningTask = false
 		manager.lastUpdated = time.Now().Unix()
@@ -84,7 +92,7 @@ func (manager *TransferManagerService) TaskUpdateTransfersList() {
 
 	for _, transfer := range transfers {
 		found := false
-		for _, arr := range *manager.arrs {
+		for _, arr := range manager.arrsManager.GetArrs() {
 			if found {
 				break
 			}
