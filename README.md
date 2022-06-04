@@ -39,38 +39,19 @@ sudo dpkg -i premiumizearr_x.x.x.x_linux_amd64.deb
 
 [Docker images are listed here](https://github.com/jackdallas/Premiumizearr/pkgs/container/premiumizearr)
 
-`docker run ghcr.io/jackdallas/premiumizearr:latest /host/config.yaml:/opt/app/config.yaml -v /host/downloads:/downloads -v /host/blackhole:/blackhole`
+`docker run ghcr.io/jackdallas/premiumizearr:latest /host/data/path:/data -v /host/downloads/path:/downloads -v /host/blackhole/path:/blackhole`
 
-You'll need to then point your config at `/blackhole` and `/downloads` (config explained more below)
+> Note: The /data mount is where the `config.yaml` and log files are kept
 
 ## Setup
 
 ### Premiumizearrd
 
-Edit the config file at `/opt/premiumizearrd/config.yml`
+Running for the first time the server will start on http://0.0.0.0:8182
 
-`Arrs:` A list of *Arr clients you wish to connect to in the format`
+If you already use this binding you can edit them in the `config.yaml` 
 
-    ```
-    - Name: "Sonarr 1"
-      URL: http://127.0.0.1:8989
-      APIKey: xxxxxxx
-      Type: Sonarr
-    ```
-
-Note: Type is either `Sonarr` or `Radarr` with a capital letter 
-
-`PremiumizemeAPIKey` API key for your [premiumize.me](https://www.premiumize.me) account
-
-`BlackholeDirectory` Path to Directory the Arr's will put magnet/torrent/nzb files in
-
-`DownloadsDirectory` Path for Premiumizearr to download media files to, that the Arr's watch for new media
-
-`UnzipDirectory` Path for Premiumizearr to use to temporarily unzip downloads before moving, leave blank and a path in temp will me made
-
-`bindIP` IP the web server binds to
-
-`bindPort` Port the web server binds to
+> Note: Currently most changes in the config ui will not be used until a restart is complete
 
 ### Sonarr/Radarr
 
