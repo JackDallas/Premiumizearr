@@ -75,10 +75,7 @@ dockers:
     goos: linux
     goarch: amd64
     image_templates:
-    - "ghcr.io/jackdallas/premiumizearr:{{ .Tag }}"
-    - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}"
-    - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}.{{ .Minor }}"
-    - "ghcr.io/jackdallas/premiumizearr:latest"
+    - "ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-amd64"
     skip_push: "false"
     build_flag_templates:
     - "--pull"
@@ -95,9 +92,6 @@ dockers:
     goarch: arm64
     image_templates:
     - "ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-arm64"
-    - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}-arm64"
-    - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}.{{ .Minor }}-arm64"
-    - "ghcr.io/jackdallas/premiumizearr:latest-arm64"
     skip_push: "false"
     build_flag_templates:
     - "--pull"
@@ -115,9 +109,6 @@ dockers:
     goarm: 7
     image_templates:
     - "ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-armv7"
-    - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}-armv7"
-    - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}.{{ .Minor }}-armv7"
-    - "ghcr.io/jackdallas/premiumizearr:latest-armv7"
     skip_push: "false"
     build_flag_templates:
     - "--pull"
@@ -129,9 +120,36 @@ dockers:
     extra_files:
     - build/static/
 
+docker_manifests:
+    # Release variants not created on rc-$i tags
+  - skip_push: auto
+  - name_template: 'ghcr.io/jackdallas/premiumizearr:latest'
+    image_templates:
+    - 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-amd64'
+    - 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-armv7'
+    - 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-arm64'
+  - name_template: 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}'
+    image_templates:
+    - 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-amd64'
+    - 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-armv7'
+    - 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-arm64'
+  - name_template: 'ghcr.io/jackdallas/premiumizearr:{{ .Major }}'
+    image_templates:
+    - 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-amd64'
+    - 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-armv7'
+    - 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-arm64'
+  - name_template: 'ghcr.io/jackdallas/premiumizearr:{{ .Major }}.{{ .Minor }}'
+    image_templates:
+    - 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-amd64'
+    - 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-armv7'
+    - 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-arm64'
+
 release:
   # If set to auto, will mark the release as not ready for production
   # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
   # If set to true, will mark the release as not ready for production.
   # Default is false.
   prerelease: auto
+  footer: "**Full Changelog**: https://github.com/JackDallas/Premiumizearr/compare/{{ .PreviousTag }}...{{ .Tag }}"
+
+
