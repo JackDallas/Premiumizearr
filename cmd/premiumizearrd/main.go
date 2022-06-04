@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"path"
 	"time"
 
 	"github.com/jackdallas/premiumizearr/internal/arr"
@@ -21,10 +22,12 @@ func main() {
 	//Flags
 	var logLevel string
 	var configFile string
+	var loggingDirectory string
 
 	//Parse flags
 	flag.StringVar(&logLevel, "log", utils.EnvOrDefault("PREMIUMIZEARR_LOG_LEVEL", "info"), "Logging level: \n \tinfo,debug,trace")
-	flag.StringVar(&configFile, "config", utils.EnvOrDefault("PREMIUMIZEARR_CONFIG_PATH", ""), "Config file path")
+	flag.StringVar(&configFile, "config", utils.EnvOrDefault("PREMIUMIZEARR_CONFIG_DIR_PATH", "./"), "The directory the config.yml is located in")
+	flag.StringVar(&loggingDirectory, "logging-dir", utils.EnvOrDefault("PREMIUMIZEARR_LOGGING_DIR_PATH", "./"), "The directory logs are to be written to")
 	flag.Parse()
 
 	lvl, err := log.ParseLevel(logLevel)
@@ -35,7 +38,7 @@ func main() {
 	log.SetLevel(lvl)
 	hook, err := lumberjackrus.NewHook(
 		&lumberjackrus.LogFile{
-			Filename:   "/opt/premiumizearrd/premiumizearr.general.log",
+			Filename:   path.Join(loggingDirectory, "premiumizearr.general.log"),
 			MaxSize:    100,
 			MaxBackups: 1,
 			MaxAge:     1,
@@ -46,7 +49,7 @@ func main() {
 		&log.TextFormatter{},
 		&lumberjackrus.LogFileOpts{
 			log.InfoLevel: &lumberjackrus.LogFile{
-				Filename:   "/opt/premiumizearrd/premiumizearr.info.log",
+				Filename:   path.Join(loggingDirectory, "premiumizearr.info.log"),
 				MaxSize:    100,
 				MaxBackups: 1,
 				MaxAge:     1,
@@ -54,7 +57,7 @@ func main() {
 				LocalTime:  false,
 			},
 			log.ErrorLevel: &lumberjackrus.LogFile{
-				Filename:   "/opt/premiumizearrd/premiumizearr.error.log",
+				Filename:   path.Join(loggingDirectory, "premiumizearr.error.log"),
 				MaxSize:    100,   // optional
 				MaxBackups: 1,     // optional
 				MaxAge:     1,     // optional
@@ -80,7 +83,7 @@ func main() {
 	}
 
 	if config.PremiumizemeAPIKey == "" {
-		panic("premiumizearr API Key is empty")
+		log.Warn("Premiumizeme API key not set, application will not work until it's set")
 	}
 
 	// Initialisation
