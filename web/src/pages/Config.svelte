@@ -18,11 +18,12 @@
   let webRoot = window.location.href;
 
   let config = {
-    BlackholeDirectory: "Initializing...",
-    DownloadsDirectory: "Initializing...",
-    UnzipDirectory: "Initializing...",
-    BindIP: "Initializing...",
-    BindPort: "Initializing...",
+    BlackholeDirectory: "",
+    DownloadsDirectory: "",
+    UnzipDirectory: "",
+    BindIP: "",
+    BindPort: "",
+    WebRoot: "",
     SimultaneousDownloads: 0,
     Arrs: [],
   };
@@ -184,6 +185,11 @@
           disabled={inputDisabled}
           labelText="Bind Port"
           bind:value={config.BindPort}
+        />
+        <TextInput
+          disabled={inputDisabled}
+          labelText="Web Root"
+          bind:value={config.WebRoot}
         />
       </FormGroup>
       <h4>Download Settings</h4>
