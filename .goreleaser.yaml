@@ -79,7 +79,7 @@ dockers:
     - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}"
     - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}.{{ .Minor }}"
     - "ghcr.io/jackdallas/premiumizearr:latest"
-    skip_push: auto
+    skip_push: "false"
     build_flag_templates:
     - "--pull"
     - "--label=org.opencontainers.image.created={{.Date}}"
@@ -98,7 +98,7 @@ dockers:
     - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}-arm64"
     - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}.{{ .Minor }}-arm64"
     - "ghcr.io/jackdallas/premiumizearr:latest-arm64"
-    skip_push: auto
+    skip_push: "false"
     build_flag_templates:
     - "--pull"
     - "--label=org.opencontainers.image.created={{.Date}}"
@@ -118,7 +118,7 @@ dockers:
     - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}-armv7"
     - "ghcr.io/jackdallas/premiumizearr:v{{ .Major }}.{{ .Minor }}-armv7"
     - "ghcr.io/jackdallas/premiumizearr:latest-armv7"
-    skip_push: auto
+    skip_push: "false"
     build_flag_templates:
     - "--pull"
     - "--label=org.opencontainers.image.created={{.Date}}"
@@ -128,3 +128,10 @@ dockers:
     - "--platform=linux/arm/v7"
     extra_files:
     - build/static/
+
+release:
+  # If set to auto, will mark the release as not ready for production
+  # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
+  # If set to true, will mark the release as not ready for production.
+  # Default is false.
+  prerelease: auto
