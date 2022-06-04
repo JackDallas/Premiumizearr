@@ -28,10 +28,12 @@ var indexBytes []byte
 type server struct {
 	transferManager         *service.TransferManagerService
 	directoryWatcherService *service.DirectoryWatcherService
+	config                  *config.Config
 }
 
 // http Router
 func StartWebServer(transferManager *service.TransferManagerService, directoryWatcher *service.DirectoryWatcherService, config *config.Config) {
+	log.Info("Starting web server...")
 	tmpl, err := template.ParseFiles("./static/index.html")
 	if err != nil {
 		log.Fatal(err)
@@ -47,6 +49,7 @@ func StartWebServer(transferManager *service.TransferManagerService, directoryWa
 	s := server{
 		transferManager:         transferManager,
 		directoryWatcherService: directoryWatcher,
+		config:                  config,
 	}
 	spa := spaHandler{
 		staticPath: "static",
@@ -59,27 +62,33 @@ func StartWebServer(transferManager *service.TransferManagerService, directoryWa
 	transferPath := "/api/transfers"
 	downloadsPath := "/api/downloads"
 	blackholePath := "/api/blackhole"
+	configPathBase := "/api/config"
 
 	if config.WebRoot != "" {
 		transferPath = path.Join(config.WebRoot, transferPath)
 		downloadsPath = path.Join(config.WebRoot, downloadsPath)
 		blackholePath = path.Join(config.WebRoot, blackholePath)
+		configPathBase = path.Join(config.WebRoot, configPathBase)
 	}
 
 	r.HandleFunc(transferPath, s.TransfersHandler)
 	r.HandleFunc(downloadsPath, s.DownloadsHandler)
 	r.HandleFunc(blackholePath, s.BlackholeHandler)
+	r.HandleFunc(configPathBase, s.ConfigHandler)
 
 	r.PathPrefix("/").Handler(spa)
 
+	address := fmt.Sprintf("%s:%s", config.BindIP, config.BindPort)
+
 	srv := &http.Server{
 		Handler: r,
-		Addr:    fmt.Sprintf("%s:%s", config.BindIP, config.BindPort),
+		Addr:    address,
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
 
+	log.Infof("Web server started on %s", address)
 	srv.ListenAndServe()
 }
 
@@ -173,7 +182,7 @@ func (s *server) BlackholeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
-// Shamlessly stolen from mux examples https://github.com/gorilla/mux#examples
+// Shamelessly stolen from mux examples https://github.com/gorilla/mux#examples
 type spaHandler struct {
 	staticPath string
 	indexPath  string
