@@ -3,7 +3,9 @@ package config
 import (
 	"errors"
 	"io/ioutil"
-	"log"
+
+	log "github.com/sirupsen/logrus"
+
 	"os"
 	"path"
 
@@ -31,6 +33,8 @@ type ArrConfig struct {
 }
 
 type Config struct {
+	altConfigLocation string
+
 	PremiumizemeAPIKey string `yaml:"PremiumizemeAPIKey"`
 
 	Arrs []ArrConfig `yaml:"Arrs"`
@@ -48,9 +52,9 @@ type Config struct {
 	SimultaneousDownloads int `yaml:"SimultaneousDownloads"`
 }
 
-func loadConfigFromDisk() (Config, error) {
+func loadConfigFromDisk(altConfigLocation string) (Config, error) {
 	var config Config
-	file, err := ioutil.ReadFile("config.yaml")
+	file, err := ioutil.ReadFile(path.Join(altConfigLocation, "config.yaml"))
 
 	if err != nil {
 		return config, ErrFailedToFindConfigFile
@@ -63,13 +67,25 @@ func loadConfigFromDisk() (Config, error) {
 
 	config = versionUpdateConfig(config)
 
-	data, err := yaml.Marshal(config)
+	config.Save()
+
+	config.altConfigLocation = altConfigLocation
+	return config, nil
+}
+
+func (c *Config) Save() bool {
+	data, err := yaml.Marshal(*c)
 	if err == nil {
 		//Save config to disk to add missing fields
-		ioutil.WriteFile("config.yaml", data, 0644)
+		log.Tracef("Saving config to %s", path.Join(c.altConfigLocation, "config.yaml"))
+		err = ioutil.WriteFile(path.Join(c.altConfigLocation, "config.yaml"), data, 0644)
+		if err != nil {
+			log.Errorf("Failed to save config file: %+v", err)
+			return false
+		}
 	}
-
-	return config, nil
+	log.Trace("Config saved")
+	return true
 }
 
 func versionUpdateConfig(config Config) Config {
@@ -81,12 +97,12 @@ func versionUpdateConfig(config Config) Config {
 	return config
 }
 
-func createDefaultConfig() error {
+func createDefaultConfig(altConfigLocation string) error {
 	config := Config{
 		PremiumizemeAPIKey: "xxxxxxxxx",
 		Arrs: []ArrConfig{
-			{URL: "http://localhost:8989", APIKey: "xxxxxxxxx", Type: Sonarr},
-			{URL: "http://localhost:7878", APIKey: "xxxxxxxxx", Type: Radarr},
+			{Name: "Sonarr", URL: "http://localhost:8989", APIKey: "xxxxxxxxx", Type: Sonarr},
+			{Name: "Radarr", URL: "http://localhost:7878", APIKey: "xxxxxxxxx", Type: Radarr},
 		},
 		BlackholeDirectory:    "",
 		DownloadsDirectory:    "",
@@ -102,7 +118,7 @@ func createDefaultConfig() error {
 		return err
 	}
 
-	err = ioutil.WriteFile("config.yaml", file, 0644)
+	err = ioutil.WriteFile(path.Join(altConfigLocation, "config.yaml"), file, 0644)
 	if err != nil {
 		return err
 	}
@@ -111,20 +127,15 @@ func createDefaultConfig() error {
 }
 
 func LoadOrCreateConfig(altConfigLocation string) (Config, error) {
-	if altConfigLocation != "" {
-		if _, err := ioutil.ReadFile(altConfigLocation); err != nil {
-			log.Panicf("Failed to find config file at %s Error: %+v", altConfigLocation, err)
-		}
-	}
 
-	config, err := loadConfigFromDisk()
+	config, err := loadConfigFromDisk(altConfigLocation)
 	if err != nil {
 		if err == ErrFailedToFindConfigFile {
-			err = createDefaultConfig()
+			err = createDefaultConfig(altConfigLocation)
 			if err != nil {
 				return config, err
 			}
-			panic("Default config created, please fill it out")
+			log.Warn("No config file found, created default config file")
 		}
 		if err == ErrInvalidConfigFile {
 			return config, ErrInvalidConfigFile
