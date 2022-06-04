@@ -19,17 +19,16 @@ func NewDirectoryWatcher(path string, recursive bool, matchFunction func(string)
 }
 
 func (w *WatchDirectory) Watch() error {
-	watcher, err := fsnotify.NewWatcher()
+	var err error
+	w.watcher, err = fsnotify.NewWatcher()
 	if err != nil {
 		return err
 	}
-	defer watcher.Close()
 
-	done := make(chan bool)
 	go func() {
 		for {
 			select {
-			case event, ok := <-watcher.Events:
+			case event, ok := <-w.watcher.Events:
 				if !ok {
 					return
 				}
@@ -38,7 +37,7 @@ func (w *WatchDirectory) Watch() error {
 						w.CallbackFunction(event.Name)
 					}
 				}
-			case _, ok := <-watcher.Errors:
+			case _, ok := <-w.watcher.Errors:
 				if !ok {
 					return
 				}
@@ -52,10 +51,20 @@ func (w *WatchDirectory) Watch() error {
 		return err
 	}
 
-	err = watcher.Add(cleanPath)
+	err = w.watcher.Add(cleanPath)
 	if err != nil {
 		return err
 	}
-	<-done
+
 	return nil
+}
+
+func (w *WatchDirectory) UpdatePath(path string) error {
+	w.watcher.Remove(w.Path)
+	w.Path = path
+	return w.watcher.Add(w.Path)
+}
+
+func (w *WatchDirectory) Stop() error {
+	return w.watcher.Close()
 }

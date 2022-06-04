@@ -9,7 +9,6 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-//TODO: Thread Safe version
 type IArr interface {
 	HistoryContains(string) (int64, bool)
 	MarkHistoryItemAsFailed(int64) error
