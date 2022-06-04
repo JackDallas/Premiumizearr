@@ -1,14 +1,13 @@
 <script>
   import { DataTable, InlineLoading } from "carbon-components-svelte";
+  import { CalculateAPIPath } from "../Utilities/web_root";
 
   export let totalName = "";
   export let headers = {};
-  export let webRoot = "";
   export let updateTimeSeconds = 10;
   export let APIpath = "/api/transfers";
   export let dataToRows = function (data) {
-    if (!data)
-      return [];
+    if (!data) return [];
     return data;
   };
   
@@ -21,7 +20,7 @@
     if (updating) return;
     // Refresh from endpoint
     updating = true;
-    fetch(webRoot + APIpath)
+    fetch(CalculateAPIPath(APIpath))
       .then((res) => res.json())
       .then((data) => {
         rows = dataToRows(data.data);
@@ -46,16 +45,17 @@
 <main>
   {#if totalName !== ""}
     <p>
-      {totalName} {safeLength(rows)}
+      {totalName}
+      {safeLength(rows)}
     </p>
   {/if}
   <p>
-  <InlineLoading status={statusIndicator} description="Update status" />
+    <InlineLoading status={statusIndicator} description="Update status" />
   </p>
   <p>
-   Message: {status}
+    Message: {status}
   </p>
   <p>
-   <DataTable sortable {headers} {rows} />
+    <DataTable sortable {headers} {rows} />
   </p>
 </main>
