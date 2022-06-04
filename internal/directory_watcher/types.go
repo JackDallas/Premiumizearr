@@ -1,5 +1,7 @@
 package directory_watcher
 
+import "github.com/fsnotify/fsnotify"
+
 // WatchDirectory watches a directory for changes.
 type WatchDirectory struct {
 	// Path is the path to the directory to watch.
@@ -12,4 +14,6 @@ type WatchDirectory struct {
 	MatchFunction func(string) bool
 	// Callback is the function to call when a file is created that matches with MatchFunction.
 	CallbackFunction func(string)
+	// watcher is the fsnotify watcher.
+	watcher *fsnotify.Watcher
 }

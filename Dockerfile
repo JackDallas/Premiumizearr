@@ -6,6 +6,9 @@ RUN apt update && \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /data
+RUN mkdir /unzip
+RUN mkdir /downloads
+RUN mkdir /transfers
 
 ENV PREMIUMIZEARR_CONFIG_DIR_PATH=/data
 ENV PREMIUMIZEARR_LOGGING_DIR_PATH=/data

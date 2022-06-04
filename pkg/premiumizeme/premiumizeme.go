@@ -22,8 +22,8 @@ type Premiumizeme struct {
 	APIKey string
 }
 
-func NewPremiumizemeClient(APIKey string) *Premiumizeme {
-	return &Premiumizeme{APIKey: APIKey}
+func NewPremiumizemeClient(APIKey string) Premiumizeme {
+	return Premiumizeme{APIKey: APIKey}
 }
 
 func (pm *Premiumizeme) createPremiumizemeURL(urlPath string) (url.URL, error) {
