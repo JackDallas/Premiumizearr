@@ -5,6 +5,8 @@ RUN apt update && \
     apt install ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
+RUN mkdir /data
+
 ENV PREMIUMIZEARR_CONFIG_DIR_PATH=/data
 ENV PREMIUMIZEARR_LOGGING_DIR_PATH=/data
 

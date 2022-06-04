@@ -78,6 +78,19 @@ func main() {
 
 	config, err := config.LoadOrCreateConfig(configFile)
 
+	// Override config data directories if running in docker
+	if utils.IsRunningInDockerContainer() {
+		if config.BlackholeDirectory == "" {
+			config.BlackholeDirectory = "/blackhole"
+		}
+		if config.DownloadsDirectory == "" {
+			config.DownloadsDirectory = "/downloads"
+		}
+		if config.UnzipDirectory == "" {
+			config.UnzipDirectory = "/unzip"
+		}
+	}
+
 	if err != nil {
 		panic(err)
 	}
