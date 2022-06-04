@@ -1,5 +1,7 @@
 # Premiumizearr
 
+[![Build](https://github.com/JackDallas/Premiumizearr/actions/workflows/build.yml/badge.svg)](https://github.com/JackDallas/Premiumizearr/actions/workflows/build.yml)
+
 ## Features
 
 - Monitor blackhole directory to push `.magnet` and `.nzb` to Premiumize.me
