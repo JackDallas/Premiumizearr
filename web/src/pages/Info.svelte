@@ -5,8 +5,6 @@
 
   let dlSpeed = 0;
 
-  let webRoot = window.location.href;
-
   function parseDLSpeedFromMessage(m) {
     if (m == "Loading..." || m == undefined) return 0;
     if (m == "too many missing articles") return 0;
@@ -105,7 +103,6 @@
             { key: "id", value: "Pos" },
             { key: "name", value: "Name", sort: false },
           ]}
-          {webRoot}
           APIpath="api/blackhole"
           zebra={true}
           totalName="In Queue: "
@@ -121,7 +118,6 @@
             { key: "speed", value: "Speed" },
           ]}
           updateTimeSeconds={2}
-          {webRoot}
           APIpath="api/downloads"
           zebra={true}
           totalName="Downloading: "
@@ -139,7 +135,6 @@
             { key: "progress", value: "Progress" },
             { key: "message", value: "Message", sort: false },
           ]}
-          {webRoot}
           APIpath="api/transfers"
           zebra={true}
           {dataToRows}

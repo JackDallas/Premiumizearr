@@ -14,8 +14,7 @@
     AddFilled,
     TrashCan,
   } from "carbon-icons-svelte";
-
-  let webRoot = window.location.href;
+  import { CalculateAPIPath } from "../Utilities/web_root";
 
   let config = {
     BlackholeDirectory: "",
@@ -37,7 +36,7 @@
 
   function getConfig() {
     inputDisabled = true;
-    fetch(webRoot + "api/config")
+    fetch(CalculateAPIPath("api/config"))
       .then((response) => response.json())
       .then((data) => {
         config = data;
@@ -50,7 +49,7 @@
 
   function submit() {
     inputDisabled = true;
-    fetch(webRoot + "api/config", {
+    fetch(CalculateAPIPath("api/config"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -93,7 +92,6 @@
   }
 
   function RemoveArr(index) {
-    console.log(index);
     config.Arrs.splice(index, 1);
     //Force re-paint
     config.Arrs = [...config.Arrs];
