@@ -21,6 +21,7 @@ type DirectoryWatcherService struct {
 	Queue              *stringqueue.StringQueue
 	status             string
 	downloadsFolderID  string
+	watchDirectory     *directory_watcher.WatchDirectory
 }
 
 const (
@@ -28,11 +29,27 @@ const (
 	ERROR_ALREADY_UPLOADED = "You already added this job."
 )
 
-func NewDirectoryWatcherService(pm *premiumizeme.Premiumizeme, con *config.Config) DirectoryWatcherService {
+func (DirectoryWatcherService) New() DirectoryWatcherService {
 	return DirectoryWatcherService{
-		premiumizemeClient: pm,
-		config:             con,
+		premiumizemeClient: nil,
+		config:             nil,
+		Queue:              nil,
 		status:             "",
+		downloadsFolderID:  "",
+	}
+}
+
+func (dw *DirectoryWatcherService) Init(premiumizemeClient *premiumizeme.Premiumizeme, config *config.Config) {
+	dw.premiumizemeClient = premiumizemeClient
+	dw.config = config
+}
+
+func (dw *DirectoryWatcherService) ConfigUpdatedCallback(currentConfig config.Config, newConfig config.Config) {
+	if currentConfig.BlackholeDirectory != newConfig.BlackholeDirectory {
+		log.Info("Blackhole directory changed, restarting directory watcher...")
+		log.Info("Running initial directory scan...")
+		go dw.initialDirectoryScan(dw.config.BlackholeDirectory)
+		dw.watchDirectory.UpdatePath(newConfig.BlackholeDirectory)
 	}
 }
 
@@ -42,13 +59,18 @@ func (dw *DirectoryWatcherService) GetStatus() string {
 
 //TODO (Radarr): accept paths as a parameter, support multiple paths
 //Watch: This is the entrypoint for the directory watcher
-func (dw *DirectoryWatcherService) Watch() {
+func (dw *DirectoryWatcherService) Start() {
 	log.Info("Starting directory watcher...")
 
 	dw.downloadsFolderID = utils.GetDownloadsFolderIDFromPremiumizeme(dw.premiumizemeClient)
 
 	log.Info("Clearing tmp directory...")
 	tempDir := dw.config.GetTempBaseDir()
+
+	if tempDir == "/" || tempDir == "\\" || tempDir == "C:\\" {
+		panic("Unzip directory is set to system root don't do that it will wipe your system!")
+	}
+
 	err := os.RemoveAll(tempDir)
 	if err != nil {
 		log.Errorf("Error clearing tmp directory %s", tempDir)
@@ -61,17 +83,17 @@ func (dw *DirectoryWatcherService) Watch() {
 	log.Info("Starting uploads processor...")
 	go dw.processUploads()
 
-	log.Info("Starting initial directory scans...")
+	log.Info("Running initial directory scan...")
 	go dw.initialDirectoryScan(dw.config.BlackholeDirectory)
 
 	// Build and start a DirectoryWatcher
-	watcher := directory_watcher.NewDirectoryWatcher(dw.config.BlackholeDirectory,
+	dw.watchDirectory = directory_watcher.NewDirectoryWatcher(dw.config.BlackholeDirectory,
 		false,
 		dw.checkFile,
 		dw.addFileToQueue,
 	)
 
-	watcher.Watch()
+	dw.watchDirectory.Watch()
 }
 
 func (dw *DirectoryWatcherService) initialDirectoryScan(p string) {
@@ -119,7 +141,6 @@ func (dw *DirectoryWatcherService) addFileToQueue(path string) {
 }
 
 func (dw *DirectoryWatcherService) processUploads() {
-	//TODO: Global running state
 	for {
 		if dw.Queue.Len() < 1 {
 			log.Trace("No files in Queue, sleeping for 10 seconds")

@@ -1,9 +1,9 @@
 package config
 
 import (
-	"errors"
 	"io/ioutil"
 
+	"github.com/jackdallas/premiumizearr/internal/utils"
 	log "github.com/sirupsen/logrus"
 
 	"os"
@@ -12,44 +12,56 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var (
-	ErrInvalidConfigFile      = errors.New("invalid Config File")
-	ErrFailedToFindConfigFile = errors.New("failed to find config file")
-)
+// LoadOrCreateConfig - Loads the config from disk or creates a new one
+func LoadOrCreateConfig(altConfigLocation string, _appCallback AppCallback) (Config, error) {
+	config, err := loadConfigFromDisk(altConfigLocation)
+	if err != nil {
+		if err == ErrFailedToFindConfigFile {
+			config = defaultConfig(altConfigLocation)
+			log.Warn("No config file found, created default config file")
+			// Override config data directories if running in docker
+			if utils.IsRunningInDockerContainer() {
+				if config.BlackholeDirectory == "" {
+					config.BlackholeDirectory = "/blackhole"
+				}
+				if config.DownloadsDirectory == "" {
+					config.DownloadsDirectory = "/downloads"
+				}
+			}
+			config.Save()
+		}
+		if err == ErrInvalidConfigFile {
+			return config, ErrInvalidConfigFile
+		}
+	}
+	// Override unzip directory if running in docker
+	if utils.IsRunningInDockerContainer() {
+		config.UnzipDirectory = "/unzip"
+	}
 
-//ArrType enum for Sonarr/Radarr
-type ArrType string
+	config.appCallback = _appCallback
 
-const (
-	Sonarr ArrType = "Sonarr"
-	Radarr ArrType = "Radarr"
-)
-
-type ArrConfig struct {
-	Name   string  `yaml:"Name"`
-	URL    string  `yaml:"URL"`
-	APIKey string  `yaml:"APIKey"`
-	Type   ArrType `yaml:"Type"`
+	return config, nil
 }
 
-type Config struct {
-	altConfigLocation string
+// Save - Saves the config to disk
+func (c *Config) Save() bool {
+	log.Trace("Marshaling & saving config")
+	data, err := yaml.Marshal(*c)
+	if err != nil {
+		log.Error(err)
+		return false
+	}
 
-	PremiumizemeAPIKey string `yaml:"PremiumizemeAPIKey"`
+	log.Tracef("Writing config to %s", path.Join(c.altConfigLocation, "config.yaml"))
+	err = ioutil.WriteFile(path.Join(c.altConfigLocation, "config.yaml"), data, 0644)
+	if err != nil {
+		log.Errorf("Failed to save config file: %+v", err)
+		return false
+	}
 
-	Arrs []ArrConfig `yaml:"Arrs"`
-
-	BlackholeDirectory string `yaml:"BlackholeDirectory"`
-	DownloadsDirectory string `yaml:"DownloadsDirectory"`
-
-	UnzipDirectory string `yaml:"UnzipDirectory"`
-
-	BindIP   string `yaml:"bindIP"`
-	BindPort string `yaml:"bindPort"`
-
-	WebRoot string `yaml:"WebRoot"`
-
-	SimultaneousDownloads int `yaml:"SimultaneousDownloads"`
+	log.Trace("Config saved")
+	return true
 }
 
 func loadConfigFromDisk(altConfigLocation string) (Config, error) {
@@ -71,25 +83,6 @@ func loadConfigFromDisk(altConfigLocation string) (Config, error) {
 
 	config.altConfigLocation = altConfigLocation
 	return config, nil
-}
-
-func (c *Config) Save() bool {
-	log.Trace("Marshaling & saving config")
-	data, err := yaml.Marshal(*c)
-	if err != nil {
-		log.Error(err)
-		return false
-	}
-
-	log.Tracef("Writing config to %s", path.Join(c.altConfigLocation, "config.yaml"))
-	err = ioutil.WriteFile(path.Join(c.altConfigLocation, "config.yaml"), data, 0644)
-	if err != nil {
-		log.Errorf("Failed to save config file: %+v", err)
-		return false
-	}
-
-	log.Trace("Config saved")
-	return true
 }
 
 func versionUpdateConfig(config Config) Config {
@@ -116,23 +109,6 @@ func defaultConfig(altConfigLocation string) Config {
 		WebRoot:               "",
 		SimultaneousDownloads: 5,
 	}
-}
-
-func LoadOrCreateConfig(altConfigLocation string) (Config, error) {
-
-	config, err := loadConfigFromDisk(altConfigLocation)
-	if err != nil {
-		if err == ErrFailedToFindConfigFile {
-			config = defaultConfig(altConfigLocation)
-			log.Warn("No config file found, created default config file")
-			config.Save()
-		}
-		if err == ErrInvalidConfigFile {
-			return config, ErrInvalidConfigFile
-		}
-	}
-
-	return config, nil
 }
 
 func (c *Config) GetTempBaseDir() string {
