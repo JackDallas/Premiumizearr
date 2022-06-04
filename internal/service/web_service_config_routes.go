@@ -1,4 +1,4 @@
-package web_service
+package service
 
 import (
 	"encoding/json"
@@ -13,7 +13,7 @@ type ConfigChangeResponse struct {
 	Status    string `json:"status"`
 }
 
-func (s *server) ConfigHandler(w http.ResponseWriter, r *http.Request) {
+func (s *WebServerService) ConfigHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
@@ -34,8 +34,7 @@ func (s *server) ConfigHandler(w http.ResponseWriter, r *http.Request) {
 			})
 			return
 		}
-		s.config = &newConfig
-		s.config.Save()
+		s.config.UpdateConfig(newConfig)
 		EncodeAndWriteConfigChangeResponse(w, &ConfigChangeResponse{
 			Succeeded: true,
 			Status:    "Config updated",
