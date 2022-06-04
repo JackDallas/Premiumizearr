@@ -87,7 +87,8 @@ func GetDownloadsFolderIDFromPremiumizeme(premiumizemeClient *premiumizeme.Premi
 	folders, err := premiumizemeClient.GetFolders()
 	if err != nil {
 		log.Errorf("Error getting folders: %s", err)
-		log.Fatalf("Cannot read folders from premiumize.me, exiting!")
+		log.Errorf("Cannot read folders from premiumize.me, application will not run!")
+		return ""
 	}
 
 	const folderName = "arrDownloads"
@@ -102,7 +103,7 @@ func GetDownloadsFolderIDFromPremiumizeme(premiumizemeClient *premiumizeme.Premi
 	if len(downloadsFolderID) == 0 {
 		id, err := premiumizemeClient.CreateFolder(folderName)
 		if err != nil {
-			log.Fatalf("Cannot create downloads folder on premiumize.me, exiting! %+v", err)
+			log.Errorf("Cannot create downloads folder on premiumize.me, application will not run correctly! %+v", err)
 		}
 		downloadsFolderID = id
 	}
