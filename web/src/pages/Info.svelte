@@ -106,7 +106,7 @@
             { key: "name", value: "Name", sort: false },
           ]}
           {webRoot}
-          APIpath="api/blackhole"
+          APIpath="/api/blackhole"
           zebra={true}
           totalName="In Queue: "
         />
@@ -122,7 +122,7 @@
           ]}
           updateTimeSeconds={2}
           {webRoot}
-          APIpath="api/downloads"
+          APIpath="/api/downloads"
           zebra={true}
           totalName="Downloading: "
         />
@@ -140,7 +140,7 @@
             { key: "message", value: "Message", sort: false },
           ]}
           {webRoot}
-          APIpath="api/transfers"
+          APIpath="/api/transfers"
           zebra={true}
           {dataToRows}
         />

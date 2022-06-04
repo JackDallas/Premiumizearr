@@ -36,7 +36,7 @@
 
   function getConfig() {
     inputDisabled = true;
-    fetch(webRoot + "api/config")
+    fetch(webRoot + "/api/config")
       .then((response) => response.json())
       .then((data) => {
         config = data;
