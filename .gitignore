@@ -20,3 +20,5 @@ premiumizearrd
 premiumizearrd.exe
 
 dist/
+
+!cmd/premiumizearrd/
