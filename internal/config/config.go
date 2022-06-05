@@ -79,9 +79,10 @@ func loadConfigFromDisk(altConfigLocation string) (Config, error) {
 
 	config = versionUpdateConfig(config)
 
+	config.altConfigLocation = altConfigLocation
+
 	config.Save()
 
-	config.altConfigLocation = altConfigLocation
 	return config, nil
 }
 
