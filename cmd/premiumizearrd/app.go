@@ -26,7 +26,7 @@ func (app *App) UnLock() {}
 
 //Start
 func (app *App) Start(logLevel string, configFile string, loggingDirectory string) error {
-	//Setup static loggin
+	//Setup static login
 	lvl, err := log.ParseLevel(logLevel)
 	if err != nil {
 		log.Errorf("Error flag not recognized, defaulting to Info!!", err)
@@ -73,18 +73,15 @@ func (app *App) Start(logLevel string, configFile string, loggingDirectory strin
 	log.Info("---------- Starting premiumizearr daemon ----------")
 	log.Info("")
 
+	log.Trace("Running load or create config")
+	log.Tracef("Reading config file location from flag or env: %s", configFile)
 	app.config, err = config.LoadOrCreateConfig(configFile, app.ConfigUpdatedCallback)
 
 	if err != nil {
 		panic(err)
 	}
 
-	if app.config.PremiumizemeAPIKey == "" {
-		log.Warn("Premiumizeme API key not set, application will not work until it's set")
-	}
-
 	// Initialisation
-
 	app.premiumizemeClient = premiumizeme.NewPremiumizemeClient(app.config.PremiumizemeAPIKey)
 
 	app.transferManager = service.TransferManagerService{}.New()
@@ -96,9 +93,9 @@ func (app *App) Start(logLevel string, configFile string, loggingDirectory strin
 	app.arrsManager.Init(&app.config)
 	app.directoryWatcher.Init(&app.premiumizemeClient, &app.config)
 
-	// Must come afer arrsManager
+	// Must come after arrsManager
 	app.transferManager.Init(&app.premiumizemeClient, &app.arrsManager, &app.config)
-	// Must come after transfer, arrmanager and directory
+	// Must come after transfer, arrManager and directory
 	app.webServer.Init(&app.transferManager, &app.directoryWatcher, &app.arrsManager, &app.config)
 
 	app.webServer.Start()
@@ -109,8 +106,6 @@ func (app *App) Start(logLevel string, configFile string, loggingDirectory strin
 	return nil
 }
 
-//ConfigUpdate - Takes copies of current and new configs to prevent editing the original config
-//... well I hope it does but I need to double check how structs are default passed
 func (app *App) ConfigUpdatedCallback(currentConfig config.Config, newConfig config.Config) {
 	app.transferManager.ConfigUpdatedCallback(currentConfig, newConfig)
 	app.directoryWatcher.ConfigUpdatedCallback(currentConfig, newConfig)
