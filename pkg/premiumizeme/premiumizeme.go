@@ -38,7 +38,15 @@ func (pm *Premiumizeme) createPremiumizemeURL(urlPath string) (url.URL, error) {
 	return *u, nil
 }
 
+var (
+	ErrAPIKeyNotSet = fmt.Errorf("premiumize.me API key not set")
+)
+
 func (pm *Premiumizeme) GetTransfers() ([]Transfer, error) {
+	if pm.APIKey == "" {
+		return nil, ErrAPIKeyNotSet
+	}
+
 	log.Trace("Getting transfers list from premiumize.me")
 	url, err := pm.createPremiumizemeURL("/transfer/list")
 	if err != nil {
@@ -70,6 +78,10 @@ func (pm *Premiumizeme) GetTransfers() ([]Transfer, error) {
 }
 
 func (pm *Premiumizeme) ListFolder(folderID string) ([]Item, error) {
+	if pm.APIKey == "" {
+		return nil, ErrAPIKeyNotSet
+	}
+
 	var ret []Item
 	url, err := pm.createPremiumizemeURL("/folder/list")
 	if err != nil {
@@ -112,6 +124,10 @@ func (pm *Premiumizeme) ListFolder(folderID string) ([]Item, error) {
 }
 
 func (pm *Premiumizeme) GetFolders() ([]Item, error) {
+	if pm.APIKey == "" {
+		return nil, ErrAPIKeyNotSet
+	}
+
 	log.Trace("Getting folder list from premiumize.me")
 	url, err := pm.createPremiumizemeURL("/folder/list")
 	if err != nil {
@@ -143,6 +159,10 @@ func (pm *Premiumizeme) GetFolders() ([]Item, error) {
 }
 
 func (pm *Premiumizeme) CreateTransfer(filePath string, parentID string) error {
+	if pm.APIKey == "" {
+		return ErrAPIKeyNotSet
+	}
+
 	//TODO: handle file size, i.e. incorrect file being saved
 	log.Trace("Opening file: ", filePath)
 	file, err := os.Open(filePath)
@@ -203,6 +223,10 @@ func (pm *Premiumizeme) CreateTransfer(filePath string, parentID string) error {
 }
 
 func (pm *Premiumizeme) DeleteFolder(folderID string) error {
+	if pm.APIKey == "" {
+		return ErrAPIKeyNotSet
+	}
+
 	url, err := pm.createPremiumizemeURL("/folder/delete")
 	if err != nil {
 		return err
@@ -246,6 +270,10 @@ func (pm *Premiumizeme) DeleteFolder(folderID string) error {
 }
 
 func (pm *Premiumizeme) CreateFolder(folderName string) (string, error) {
+	if pm.APIKey == "" {
+		return "", ErrAPIKeyNotSet
+	}
+
 	url, err := pm.createPremiumizemeURL("/folder/create")
 	if err != nil {
 		return "", err
@@ -289,6 +317,10 @@ func (pm *Premiumizeme) CreateFolder(folderName string) (string, error) {
 }
 
 func (pm *Premiumizeme) DeleteTransfer(id string) error {
+	if pm.APIKey == "" {
+		return ErrAPIKeyNotSet
+	}
+
 	url, err := pm.createPremiumizemeURL("/transfer/delete")
 	if err != nil {
 		return err
@@ -437,6 +469,10 @@ func (pm *Premiumizeme) GenerateZippedFolderLink(fileID string) (string, error) 
 }
 
 func (pm *Premiumizeme) generateZip(ID string, srcType SRCType) (string, error) {
+	if pm.APIKey == "" {
+		return "", ErrAPIKeyNotSet
+	}
+
 	// Build URL with apikey
 	URL, err := pm.createPremiumizemeURL("/zip/generate")
 	if err != nil {
