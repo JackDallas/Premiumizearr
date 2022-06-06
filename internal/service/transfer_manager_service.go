@@ -52,10 +52,35 @@ func (t *TransferManagerService) Init(pme *premiumizeme.Premiumizeme, arrsManage
 	t.premiumizemeClient = pme
 	t.arrsManager = arrsManager
 	t.config = config
+	t.CleanUpUnzipDir()
+}
+
+func (t *TransferManagerService) CleanUpUnzipDir() {
+	log.Info("Cleaning unzip directory")
+
+	unzipBase, err := t.config.GetUnzipBaseLocation()
+	if err != nil {
+		log.Errorf("Error getting unzip base location: %s", err.Error())
+		return
+	}
+
+	err = os.RemoveAll(unzipBase)
+	if err != nil {
+		log.Errorf("Error removing unzip base location: %s", err.Error())
+		return
+	}
+
+	err = os.MkdirAll(unzipBase, 0755)
+	if err != nil {
+		log.Errorf("Error creating unzip base location: %s", err.Error())
+		return
+	}
 }
 
 func (manager *TransferManagerService) ConfigUpdatedCallback(currentConfig config.Config, newConfig config.Config) {
-	//All config access is dynamic currently, function kept for potential future use
+	if currentConfig.UnzipDirectory != newConfig.UnzipDirectory {
+		manager.CleanUpUnzipDir()
+	}
 }
 
 func (manager *TransferManagerService) Run(interval time.Duration) {
@@ -202,9 +227,9 @@ func (manager *TransferManagerService) HandleFinishedItem(item premiumizeme.Item
 			manager.removeDownload(item.Name)
 			return
 		}
-		log.Trace("Downloading: ", link)
+		log.Trace("Downloading from: ", link)
 
-		tempDir, err := manager.config.GetTempDir()
+		tempDir, err := manager.config.GetNewUnzipLocation()
 		if err != nil {
 			log.Errorf("Could not create temp dir: %s", err)
 			manager.removeDownload(item.Name)
@@ -250,7 +275,7 @@ func (manager *TransferManagerService) HandleFinishedItem(item premiumizeme.Item
 		err = manager.premiumizemeClient.DeleteFolder(item.ID)
 		if err != nil {
 			manager.removeDownload(item.Name)
-			log.Error("Error deleting folder on premiumuze.me: %s", err)
+			log.Error("Error deleting folder on premiumize.me: %s", err)
 			return
 		}
 

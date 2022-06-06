@@ -64,19 +64,6 @@ func (dw *DirectoryWatcherService) Start() {
 
 	dw.downloadsFolderID = utils.GetDownloadsFolderIDFromPremiumizeme(dw.premiumizemeClient)
 
-	log.Info("Clearing tmp directory...")
-	tempDir := dw.config.GetTempBaseDir()
-
-	if tempDir == "/" || tempDir == "\\" || tempDir == "C:\\" {
-		panic("Unzip directory is set to system root don't do that it will wipe your system!")
-	}
-
-	err := os.RemoveAll(tempDir)
-	if err != nil {
-		log.Errorf("Error clearing tmp directory %s", tempDir)
-	}
-	os.Mkdir(tempDir, os.ModePerm)
-
 	log.Info("Creating Queue...")
 	dw.Queue = stringqueue.NewStringQueue()
 

@@ -5,6 +5,7 @@ import "errors"
 var (
 	ErrInvalidConfigFile      = errors.New("invalid Config File")
 	ErrFailedToFindConfigFile = errors.New("failed to find config file")
+	ErrFailedToSaveConfig     = errors.New("failed to save config")
 )
 
 //ArrType enum for Sonarr/Radarr
