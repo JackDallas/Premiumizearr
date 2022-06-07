@@ -34,6 +34,7 @@ jobs:
       id: buildx
       uses: docker/setup-buildx-action@v2
 
+# Standard Build
     - name: Build
       uses: goreleaser/goreleaser-action@v2
       if: startsWith(github.ref, 'refs/tags/') == false
@@ -51,9 +52,10 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
         
+# Release build
     - name: Release
       uses: goreleaser/goreleaser-action@v2
-      if: startsWith(github.ref, 'refs/tags/')
+      if: startsWith(github.ref, 'refs/tags/') && !contains(github.ref, '-rc')
       with:
         distribution: goreleaser
         version: latest
@@ -61,6 +63,16 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+# Pre-Release build
+    - name: Pre-Release
+      uses: goreleaser/goreleaser-action@v2
+      if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, '-rc')
+      with:
+        distribution: goreleaser
+        version: latest
+        args: release --rm-dist -f .prerelease.goreleaser.yaml
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Upload assets
       uses: actions/upload-artifact@v2
       with:

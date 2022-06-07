@@ -1,0 +1,138 @@
+before:
+  hooks:
+    - go mod tidy
+    - make web
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+    main: ./cmd/premiumizearrd
+    binary: premiumizearrd
+    goarch:
+      - amd64
+      - arm64
+      - arm
+    goarm:
+      - 7
+    ignore:
+      - goos: windows
+        goarch: arm64
+      - goos: windows
+        goarch: arm
+
+archives:
+  - format_overrides:
+      - goos: windows
+        format: zip
+    wrap_in_directory: true
+    files:
+      - README.md
+      - LICENSE
+      - src: build/*.service
+        dst: ./
+        strip_parent: true
+      - src: build/static/*
+        dst: static
+        strip_parent: true
+
+checksum:
+  name_template: 'checksums.txt'
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+
+nfpms:
+  -
+    package_name: premiumizearr
+    bindir: /opt/premiumizearrd
+    vendor: Jack Dallas.
+    homepage: https://github.com/JackDallas/Premiumizearr
+    maintainer: Dallas <jack-dallas@outlook.com>
+    description: Service to connect premiumize.me to Arr clients.
+    license: GPLv3
+    formats:
+      - deb
+    contents:
+      - src: build/static/*
+        dst: /opt/premiumizearrd/static/
+      - src: init/premiumizearrd.service
+        dst: /etc/systemd/system/premiumizearrd.service
+    scripts:
+      postinstall: "scripts/postinstall.sh"
+      
+dockers:
+  -
+    use: docker
+    goos: linux
+    goarch: amd64
+    image_templates:
+    - "ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-amd64"
+    skip_push: "false"
+    build_flag_templates:
+    - "--pull"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.title={{.ProjectName}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--platform=linux/amd64"
+    extra_files:
+    - build/static/
+  -
+    use: buildx
+    goos: linux
+    goarch: arm64
+    image_templates:
+    - "ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-arm64"
+    skip_push: "false"
+    build_flag_templates:
+    - "--pull"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.title={{.ProjectName}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--platform=linux/arm64"
+    extra_files:
+    - build/static/
+  -
+    use: buildx
+    goos: linux
+    goarch: arm
+    goarm: 7
+    image_templates:
+    - "ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-armv7"
+    skip_push: "false"
+    build_flag_templates:
+    - "--pull"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.title={{.ProjectName}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--platform=linux/arm/v7"
+    extra_files:
+    - build/static/
+
+docker_manifests:
+  - skip_push: false
+  - name_template: 'ghcr.io/jackdallas/premiumizearr:dev'
+    image_templates:
+    - 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-amd64'
+    - 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-armv7'
+    - 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-arm64'
+  - name_template: 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}'
+    image_templates:
+    - 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-amd64'
+    - 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-armv7'
+    - 'ghcr.io/jackdallas/premiumizearr:{{ .Tag }}-arm64'
+
+release:
+  prerelease: true
+  header: "Premiumizearr Pre-Release {{ .Tag }}"
+  footer: "**Full Changelog**: https://github.com/JackDallas/Premiumizearr/compare/{{ .PreviousTag }}...{{ .Tag }}"
+
+
