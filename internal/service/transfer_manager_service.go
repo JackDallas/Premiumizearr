@@ -5,6 +5,7 @@ import (
 	"path"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/jackdallas/premiumizearr/internal/config"
@@ -15,12 +16,14 @@ import (
 )
 
 type DownloadDetails struct {
+	ID                 int64
 	Added              time.Time
 	Name               string
 	ProgressDownloader *progress_downloader.WriteCounter
 }
 
 type TransferManagerService struct {
+	currentID          int64
 	premiumizemeClient *premiumizeme.Premiumizeme
 	arrsManager        *ArrsManagerService
 	config             *config.Config
@@ -162,6 +165,7 @@ func (manager *TransferManagerService) addDownload(item *premiumizeme.Item) {
 	defer manager.downloadListMutex.Unlock()
 
 	manager.downloadList[item.Name] = &DownloadDetails{
+		ID:                 atomic.AddInt64(&manager.currentID, 1),
 		Added:              time.Now(),
 		Name:               item.Name,
 		ProgressDownloader: progress_downloader.NewWriteCounter(),
