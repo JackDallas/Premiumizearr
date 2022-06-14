@@ -112,6 +112,7 @@
         <h3>Downloads</h3>
         <APITable
           headers={[
+            { key : "id", value : "ID" },
             { key: "added", value: "Added" },
             { key: "name", value: "Name" },
             { key: "progress", value: "Progress" },
