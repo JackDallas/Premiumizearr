@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -112,6 +113,24 @@ func (manager *TransferManagerService) TaskUpdateTransfersList() {
 		return
 	}
 	manager.updateTransfers(transfers)
+
+	earlyReturn := false
+
+	if len(transfers) == 0 {
+		manager.status = "No transfers"
+		earlyReturn = true
+	} else {
+		manager.status = fmt.Sprintf("Got %d transfers", len(transfers))
+	}
+
+	if len(manager.arrsManager.GetArrs()) == 0 {
+		manager.status = fmt.Sprintf("%s, no ARRs available", manager.status)
+		earlyReturn = true
+	}
+
+	if earlyReturn {
+		return
+	}
 
 	for _, transfer := range transfers {
 		found := false
