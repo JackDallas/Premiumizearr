@@ -9,6 +9,7 @@ RUN mkdir /data
 RUN mkdir /unzip
 RUN mkdir /downloads
 RUN mkdir /transfers
+RUN mkdir /blackhole
 
 ENV PREMIUMIZEARR_CONFIG_DIR_PATH=/data
 ENV PREMIUMIZEARR_LOGGING_DIR_PATH=/data
