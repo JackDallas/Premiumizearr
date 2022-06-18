@@ -118,6 +118,9 @@
             { key: "progress", value: "Progress" },
             { key: "speed", value: "Speed" },
           ]}
+          sortable={false}
+          sortKey={"id"}
+          sortOrder={"desc"}
           updateTimeSeconds={2}
           APIpath="api/downloads"
           zebra={true}
