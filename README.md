@@ -18,17 +18,33 @@
 
 ### Binary
 
-```cmd
+#### System Install
+
+```cli
 wget https://github.com/JackDallas/Premiumizearr/releases/download/x.x.x/Premiumizearr_x.x.x_linux_amd64.tar.gz
 tar xf Premiumizearr_x.x.x.x_linux_amd64.tar.gz
 cd Premiumizearr_x.x.x.x_linux_amd64
 sudo mkdir /opt/premiumizearrd/
 sudo cp -r premiumizearrd static/ /opt/premiumizearrd/
-sudo cp premiumizearrd /etc/systemd/system/
+sudo cp premiumizearrd.service /etc/systemd/system/
 sudo systemctl-reload
 sudo systemctl enable premiumizearrd.service
 sudo systemctl start premiumizearrd.service
 ```
+
+#### User Install
+
+```cli
+wget https://github.com/JackDallas/Premiumizearr/releases/download/x.x.x/Premiumizearr_x.x.x_linux_amd64.tar.gz
+tar xf Premiumizearr_x.x.x.x_linux_amd64.tar.gz
+cd Premiumizearr_x.x.x.x_linux_amd64
+mkdir -p ~/.local/bin/
+cp -r premiumizearrd static/ ~/.local/bin/
+echo -e "export PATH=~/.local/bin/:$PATH" >> ~/.bashrc 
+source ~/.bashrc
+```
+
+You're now able to run the daemon from anywhere just by typing `premiumizearrd`
 
 ### deb file
 
