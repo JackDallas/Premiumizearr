@@ -80,6 +80,7 @@ dockers:
     - "--label=org.opencontainers.image.title={{.ProjectName}}"
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
     - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--label=org.opencontainers.image.source=\"https://github.com/JackDallas/Premiumizearr\""
     - "--platform=linux/amd64"
     dockerfile: "docker/Dockerfile.amd64"
     extra_files:
@@ -98,6 +99,7 @@ dockers:
     - "--label=org.opencontainers.image.title={{.ProjectName}}"
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
     - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--label=org.opencontainers.image.source=\"https://github.com/JackDallas/Premiumizearr\""
     - "--platform=linux/arm64"
     dockerfile: "docker/Dockerfile.arm64"
     extra_files:
@@ -117,6 +119,7 @@ dockers:
     - "--label=org.opencontainers.image.title={{.ProjectName}}"
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
     - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--label=org.opencontainers.image.source=\"https://github.com/JackDallas/Premiumizearr\""
     - "--platform=linux/arm/v7"
     dockerfile: "docker/Dockerfile.armv7"
     extra_files:
