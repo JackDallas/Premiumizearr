@@ -81,8 +81,10 @@ dockers:
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
     - "--label=org.opencontainers.image.version={{.Version}}"
     - "--platform=linux/amd64"
+    dockerfile: "docker/Dockerfile.amd64"
     extra_files:
     - build/static/
+    - docker/
   -
     use: buildx
     goos: linux
@@ -97,8 +99,10 @@ dockers:
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
     - "--label=org.opencontainers.image.version={{.Version}}"
     - "--platform=linux/arm64"
+    dockerfile: "docker/Dockerfile.arm64"
     extra_files:
     - build/static/
+    - docker/
   -
     use: buildx
     goos: linux
@@ -114,8 +118,10 @@ dockers:
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
     - "--label=org.opencontainers.image.version={{.Version}}"
     - "--platform=linux/arm/v7"
+    dockerfile: "docker/Dockerfile.armv7"
     extra_files:
     - build/static/
+    - docker/
 
 docker_manifests:
   - skip_push: false
