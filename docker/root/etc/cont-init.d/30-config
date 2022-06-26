@@ -1,0 +1,10 @@
+#!/usr/bin/with-contenv bash
+
+# permissions
+chown -R abc:abc \
+    /data \
+    /unzip \
+    /downloads \
+    /transfers \
+    /blackhole \
+    /opt \
