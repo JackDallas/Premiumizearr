@@ -64,17 +64,12 @@ func (t *TransferManagerService) CleanUpUnzipDir() {
 		return
 	}
 
-	err = os.RemoveAll(unzipBase)
+	err = utils.RemoveContents(unzipBase)
 	if err != nil {
-		log.Errorf("Error removing unzip base location: %s", err.Error())
+		log.Errorf("Error cleaning unzip directory: %s", err.Error())
 		return
 	}
-
-	err = os.MkdirAll(unzipBase, 0755)
-	if err != nil {
-		log.Errorf("Error creating unzip base location: %s", err.Error())
-		return
-	}
+	
 }
 
 func (manager *TransferManagerService) ConfigUpdatedCallback(currentConfig config.Config, newConfig config.Config) {
