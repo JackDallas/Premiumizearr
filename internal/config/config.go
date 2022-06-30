@@ -81,11 +81,9 @@ func loadConfigFromDisk(altConfigLocation string) (Config, error) {
 	var config Config
 
 	log.Trace("Trying to load config from disk")
-
 	configLocation := path.Join(altConfigLocation, "config.yaml")
 
 	log.Tracef("Reading config from %s", configLocation)
-
 	file, err := ioutil.ReadFile(configLocation)
 
 	if err != nil {
@@ -93,15 +91,41 @@ func loadConfigFromDisk(altConfigLocation string) (Config, error) {
 		return config, ErrFailedToFindConfigFile
 	}
 
-	log.Trace("Attempting to unmarshal config")
-	err = yaml.Unmarshal(file, &config)
+	log.Trace("Loading to interface")
+	var configInterface map[interface{}]interface{}
+	err = yaml.Unmarshal(file, &configInterface)
 	if err != nil {
-		log.Trace("Failed to unmarshal config")
+		log.Errorf("Failed to unmarshal config file: %+v", err)
 		return config, ErrInvalidConfigFile
 	}
 
-	log.Trace("Config loaded, running version update")
-	config, updated := versionUpdateConfig(config)
+	log.Trace("Unmarshalling to struct")
+	err = yaml.Unmarshal(file, &config)
+	if err != nil {
+		log.Errorf("Failed to unmarshal config file: %+v", err)
+		return config, ErrInvalidConfigFile
+	}
+
+	log.Trace("Checking for missing config fields")
+	updated := false
+
+	if configInterface["PollBlackholeDirectory"] == nil {
+		log.Info("PollBlackholeDirectory not set, setting to false")
+		config.PollBlackholeDirectory = false
+		updated = true
+	}
+
+	if configInterface["SimultaneousDownloads"] == nil {
+		log.Info("SimultaneousDownloads not set, setting to 5")
+		config.SimultaneousDownloads = 5
+		updated = true
+	}
+
+	if configInterface["PollBlackholeIntervalMinutes"] == nil {
+		log.Info("PollBlackholeIntervalMinutes not set, setting to 10")
+		config.PollBlackholeIntervalMinutes = 10
+		updated = true
+	}
 
 	config.altConfigLocation = altConfigLocation
 
@@ -123,17 +147,6 @@ func loadConfigFromDisk(altConfigLocation string) (Config, error) {
 	return config, nil
 }
 
-func versionUpdateConfig(config Config) (Config, bool) {
-	updated := false
-	// 1.1.3
-	if config.SimultaneousDownloads == 0 {
-		config.SimultaneousDownloads = 5
-		updated = true
-	}
-
-	return config, updated
-}
-
 func defaultConfig() Config {
 	return Config{
 		PremiumizemeAPIKey: "xxxxxxxxx",
@@ -141,13 +154,15 @@ func defaultConfig() Config {
 			{Name: "Sonarr", URL: "http://localhost:8989", APIKey: "xxxxxxxxx", Type: Sonarr},
 			{Name: "Radarr", URL: "http://localhost:7878", APIKey: "xxxxxxxxx", Type: Radarr},
 		},
-		BlackholeDirectory:    "",
-		DownloadsDirectory:    "",
-		UnzipDirectory:        "",
-		BindIP:                "0.0.0.0",
-		BindPort:              "8182",
-		WebRoot:               "",
-		SimultaneousDownloads: 5,
+		BlackholeDirectory:           "",
+		PollBlackholeDirectory:       false,
+		PollBlackholeIntervalMinutes: 10,
+		DownloadsDirectory:           "",
+		UnzipDirectory:               "",
+		BindIP:                       "0.0.0.0",
+		BindPort:                     "8182",
+		WebRoot:                      "",
+		SimultaneousDownloads:        5,
 	}
 }
 
