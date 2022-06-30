@@ -48,7 +48,7 @@ func (dw *DirectoryWatcherService) ConfigUpdatedCallback(currentConfig config.Co
 	if currentConfig.BlackholeDirectory != newConfig.BlackholeDirectory {
 		log.Info("Blackhole directory changed, restarting directory watcher...")
 		log.Info("Running initial directory scan...")
-		go dw.initialDirectoryScan(dw.config.BlackholeDirectory)
+		go dw.directoryScan(dw.config.BlackholeDirectory)
 		dw.watchDirectory.UpdatePath(newConfig.BlackholeDirectory)
 	}
 }
@@ -71,7 +71,7 @@ func (dw *DirectoryWatcherService) Start() {
 	go dw.processUploads()
 
 	log.Info("Running initial directory scan...")
-	go dw.initialDirectoryScan(dw.config.BlackholeDirectory)
+	go dw.directoryScan(dw.config.BlackholeDirectory)
 
 	// Build and start a DirectoryWatcher
 	dw.watchDirectory = directory_watcher.NewDirectoryWatcher(dw.config.BlackholeDirectory,
@@ -80,14 +80,24 @@ func (dw *DirectoryWatcherService) Start() {
 		dw.addFileToQueue,
 	)
 
-	dw.watchDirectory.Watch()
+	if dw.config.PollBlackholeDirectory {
+		log.Info("Starting directory poller...")
+		for {
+			time.Sleep(time.Duration(dw.config.PollBlackholeIntervalMinutes) * time.Minute)
+			log.Info("Running directory scan of %s", dw.config.BlackholeDirectory)
+			dw.directoryScan(dw.config.BlackholeDirectory)
+			log.Infof("Scan complete, next scan in %d minutes", dw.config.PollBlackholeIntervalMinutes)
+		}
+	} else {
+		dw.watchDirectory.Watch()
+	}
 }
 
-func (dw *DirectoryWatcherService) initialDirectoryScan(p string) {
-	log.Trace("Initial directory scan")
+func (dw *DirectoryWatcherService) directoryScan(p string) {
+	log.Trace("Running directory scan")
 	files, err := ioutil.ReadDir(p)
 	if err != nil {
-		log.Errorf("Error with initial directory scan %+v", err)
+		log.Errorf("Error with directory scan %+v", err)
 	}
 
 	for _, file := range files {
@@ -110,7 +120,7 @@ func (dw *DirectoryWatcherService) checkFile(path string) bool {
 	}
 
 	if fi.IsDir() {
-		log.Errorf("Directory created in blackhole %s ignoring (Warning premiumizearrzed does not look in subfolders!)", path)
+		log.Errorf("Directory created in blackhole %s ignoring (Warning premiumizearrd does not look in subfolders!)", path)
 		return false
 	}
 
