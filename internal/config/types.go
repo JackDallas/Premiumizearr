@@ -34,7 +34,10 @@ type Config struct {
 
 	Arrs []ArrConfig `yaml:"Arrs"`
 
-	BlackholeDirectory string `yaml:"BlackholeDirectory"`
+	BlackholeDirectory           string `yaml:"BlackholeDirectory"`
+	PollBlackholeDirectory       bool   `yaml:"PollBlackholeDirectory"`
+	PollBlackholeIntervalMinutes int    `yaml:"PollBlackholeIntervalMinutes"`
+
 	DownloadsDirectory string `yaml:"DownloadsDirectory"`
 
 	UnzipDirectory string `yaml:"UnzipDirectory"`

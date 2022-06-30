@@ -15,5 +15,5 @@ type WatchDirectory struct {
 	// Callback is the function to call when a file is created that matches with MatchFunction.
 	CallbackFunction func(string)
 	// watcher is the fsnotify watcher.
-	watcher *fsnotify.Watcher
+	Watcher *fsnotify.Watcher
 }
