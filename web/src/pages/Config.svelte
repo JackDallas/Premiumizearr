@@ -7,6 +7,8 @@
     Modal,
     FormGroup,
     Dropdown,
+Form,
+Checkbox,
   } from "carbon-components-svelte";
   import {
     Save,
@@ -21,6 +23,8 @@
 
   let config = {
     BlackholeDirectory: "",
+    PollBlackholeDirectory: false,
+    PollBlackholeIntervalMinutes: 10,
     DownloadsDirectory: "",
     UnzipDirectory: "",
     BindIP: "",
@@ -261,6 +265,19 @@
           labelText="Blackhole Directory"
           bind:value={config.BlackholeDirectory}
         />
+        <Checkbox
+          disabled={inputDisabled}
+          bind:checked={config.PollBlackholeDirectory}
+          labelText="Poll Blackhole Directory"
+        />
+        <TextInput
+          type="number"
+          disabled={inputDisabled}
+          labelText="Poll Blackhole Interval Minutes"
+          bind:value={config.PollBlackholeIntervalMinutes}
+        />
+      </FormGroup>
+      <FormGroup>
         <TextInput
           disabled={inputDisabled}
           labelText="Download Directory"
