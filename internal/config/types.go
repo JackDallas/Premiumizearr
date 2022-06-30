@@ -20,32 +20,33 @@ const (
 )
 
 type ArrConfig struct {
-	Name   string  `yaml:"Name"`
-	URL    string  `yaml:"URL"`
-	APIKey string  `yaml:"APIKey"`
-	Type   ArrType `yaml:"Type"`
+	Name   string  `yaml:"Name" json:"Name"`
+	URL    string  `yaml:"URL" json:"URL"`
+	APIKey string  `yaml:"APIKey" json:"APIKey"`
+	Type   ArrType `yaml:"Type" json:"Type"`
 }
 
 type Config struct {
 	altConfigLocation string
 	appCallback       AppCallback
 
-	PremiumizemeAPIKey string `yaml:"PremiumizemeAPIKey"`
+	//PremiumizemeAPIKey string with yaml and json tag
+	PremiumizemeAPIKey string `yaml:"PremiumizemeAPIKey" json:"PremiumizemeAPIKey"`
 
-	Arrs []ArrConfig `yaml:"Arrs"`
+	Arrs []ArrConfig `yaml:"Arrs" json:"Arrs"`
 
-	BlackholeDirectory           string `yaml:"BlackholeDirectory"`
-	PollBlackholeDirectory       bool   `yaml:"PollBlackholeDirectory"`
-	PollBlackholeIntervalMinutes int    `yaml:"PollBlackholeIntervalMinutes"`
+	BlackholeDirectory           string `yaml:"BlackholeDirectory" json:"BlackholeDirectory"`
+	PollBlackholeDirectory       bool   `yaml:"PollBlackholeDirectory" json:"PollBlackholeDirectory"`
+	PollBlackholeIntervalMinutes int    `yaml:"PollBlackholeIntervalMinutes" json:"PollBlackholeIntervalMinutes"`
 
-	DownloadsDirectory string `yaml:"DownloadsDirectory"`
+	DownloadsDirectory string `yaml:"DownloadsDirectory" json:"DownloadsDirectory"`
 
-	UnzipDirectory string `yaml:"UnzipDirectory"`
+	UnzipDirectory string `yaml:"UnzipDirectory" json:"UnzipDirectory"`
 
-	BindIP   string `yaml:"bindIP"`
-	BindPort string `yaml:"bindPort"`
+	BindIP   string `yaml:"bindIP" json:"BindIP"`
+	BindPort string `yaml:"bindPort" json:"BindPort"`
 
-	WebRoot string `yaml:"WebRoot"`
+	WebRoot string `yaml:"WebRoot" json:"WebRoot"`
 
-	SimultaneousDownloads int `yaml:"SimultaneousDownloads"`
+	SimultaneousDownloads int `yaml:"SimultaneousDownloads" json:"SimultaneousDownloads"`
 }
