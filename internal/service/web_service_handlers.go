@@ -54,15 +54,15 @@ func (s *WebServerService) DownloadsHandler(w http.ResponseWriter, r *http.Reque
 	if s.transferManager == nil {
 		resp.Status = "Not Initialized"
 	} else {
-		for _, v := range s.transferManager.GetDownloads() {
-			resp.Downloads = append(resp.Downloads, Download{
-				ID:       v.ID,
-				Added:    v.Added.Unix(),
-				Name:     v.Name,
-				Progress: v.ProgressDownloader.GetProgress(),
-				Speed:    v.ProgressDownloader.GetSpeed(),
-			})
-		}
+		// for _, v := range s.transferManager.GetDownloads() {
+		// 	resp.Downloads = append(resp.Downloads, Download{
+		// 		ID:       v.ID,
+		// 		Added:    v.Added.Unix(),
+		// 		Name:     v.Name,
+		// 		Progress: v.ProgressDownloader.GetProgress(),
+		// 		Speed:    v.ProgressDownloader.GetSpeed(),
+		// 	})
+		// }
 		resp.Status = ""
 	}
 
