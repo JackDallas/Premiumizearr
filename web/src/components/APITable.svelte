@@ -2,6 +2,10 @@
   import { DataTable, InlineLoading } from "carbon-components-svelte";
   import { CalculateAPIPath } from "../Utilities/web_root";
 
+  export let sortable = true;
+  export let sortKey;
+  export let sortOrder;
+
   export let totalName = "";
   export let headers = {};
   export let updateTimeSeconds = 10;
@@ -10,7 +14,7 @@
     if (!data) return [];
     return data;
   };
-  
+
   let updating = false;
   let status = "";
   let rows = [];
@@ -56,6 +60,6 @@
     Message: {status}
   </p>
   <p>
-    <DataTable sortable {headers} {rows} />
+    <DataTable {sortKey} {sortOrder} {sortable} {headers} {rows} />
   </p>
 </main>

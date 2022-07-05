@@ -18,6 +18,7 @@ type App struct {
 	directoryWatcher   service.DirectoryWatcherService
 	webServer          service.WebServerService
 	arrsManager        service.ArrsManagerService
+	downloadManager    service.DownloadManagerService
 }
 
 // Makes go vet error - prevents copies
@@ -88,10 +89,12 @@ func (app *App) Start(logLevel string, configFile string, loggingDirectory strin
 	app.directoryWatcher = service.DirectoryWatcherService{}.New()
 	app.webServer = service.WebServerService{}.New()
 	app.arrsManager = service.ArrsManagerService{}.New()
+	app.downloadManager = service.DownloadManagerService{}.New()
 
 	// Initialise Services
 	app.arrsManager.Init(&app.config)
 	app.directoryWatcher.Init(&app.premiumizemeClient, &app.config)
+	app.downloadManager.Init(&app.premiumizemeClient, &app.config)
 
 	// Must come after arrsManager
 	app.transferManager.Init(&app.premiumizemeClient, &app.arrsManager, &app.config)

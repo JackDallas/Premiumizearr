@@ -37,6 +37,7 @@ type BlackholeResponse struct {
 }
 
 type Download struct {
+	ID       int64  `json:"id"`
 	Added    int64  `json:"added"`
 	Name     string `json:"name"`
 	Progress string `json:"progress"`
@@ -53,14 +54,15 @@ func (s *WebServerService) DownloadsHandler(w http.ResponseWriter, r *http.Reque
 	if s.transferManager == nil {
 		resp.Status = "Not Initialized"
 	} else {
-		for _, v := range s.transferManager.GetDownloads() {
-			resp.Downloads = append(resp.Downloads, Download{
-				Added:    v.Added.Unix(),
-				Name:     v.Name,
-				Progress: v.ProgressDownloader.GetProgress(),
-				Speed:    v.ProgressDownloader.GetSpeed(),
-			})
-		}
+		// for _, v := range s.transferManager.GetDownloads() {
+		// 	resp.Downloads = append(resp.Downloads, Download{
+		// 		ID:       v.ID,
+		// 		Added:    v.Added.Unix(),
+		// 		Name:     v.Name,
+		// 		Progress: v.ProgressDownloader.GetProgress(),
+		// 		Speed:    v.ProgressDownloader.GetSpeed(),
+		// 	})
+		// }
 		resp.Status = ""
 	}
 
