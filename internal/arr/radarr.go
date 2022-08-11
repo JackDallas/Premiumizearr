@@ -18,7 +18,7 @@ import (
 
 //Data Access
 
-//GetHistory: Updates the history if it's been more than 15 seconds since last update
+// GetHistory: Updates the history if it's been more than 15 seconds since last update
 func (arr *RadarrArr) GetHistory() (radarr.History, error) {
 	arr.LastUpdateMutex.Lock()
 	defer arr.LastUpdateMutex.Unlock()
@@ -78,20 +78,20 @@ func (arr *RadarrArr) GetArrName() string {
 //Functions
 
 func (arr *RadarrArr) HistoryContains(name string) (int64, bool) {
-	log.Tracef("Radarr.HistoryContains(): Checking history for %s", name)
+	log.Tracef("Radarr [%s]: Checking history for %s", arr.Name, name)
 	his, err := arr.GetHistory()
 	if err != nil {
-		log.Errorf("Radarr.HistoryContains(): Failed to get history: %+v", err)
+		log.Errorf("Radarr [%s]: Failed to get history: %+v", arr.Name, err)
 		return -1, false
 	}
-	log.Trace("Radarr.HistoryContains(): Got History, now Locking History")
+	log.Trace("Radarr [%s]: Got History, now Locking History", arr.Name)
 	arr.HistoryMutex.Lock()
 	defer arr.HistoryMutex.Unlock()
 
 	name = utils.StripDownloadTypesExtention(name)
 	// name = strings.ReplaceAll(name, ".", " ")
 	for _, item := range his.Records {
-		if item.SourceTitle == name {
+		if utils.StripDownloadTypesExtention(item.SourceTitle) == name || item.SourceTitle == name {
 			return item.ID, true
 		}
 	}
