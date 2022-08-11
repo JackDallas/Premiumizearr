@@ -18,7 +18,7 @@ import (
 
 //Data Access
 
-//GetHistory: Updates the history if it's been more than 15 seconds since last update
+// GetHistory: Updates the history if it's been more than 15 seconds since last update
 func (arr *SonarrArr) GetHistory() (sonarr.History, error) {
 	arr.LastUpdateMutex.Lock()
 	defer arr.LastUpdateMutex.Unlock()
@@ -77,22 +77,22 @@ func (arr *SonarrArr) GetArrName() string {
 // Functions
 
 func (arr *SonarrArr) HistoryContains(name string) (int64, bool) {
-	log.Tracef("Sonarr.HistoryContains(): Checking history for %s", name)
+	log.Tracef("Sonarr [%s]: Checking history for %s", arr.Name, name)
 	his, err := arr.GetHistory()
 	if err != nil {
 		return 0, false
 	}
-	log.Trace("Sonarr.HistoryContains(): Got History, now Locking History")
+	log.Trace("Sonarr [%s]: Got History, now Locking History")
 	arr.HistoryMutex.Lock()
 	defer arr.HistoryMutex.Unlock()
 
 	name = utils.StripDownloadTypesExtention(name)
 	for _, item := range his.Records {
-		if utils.StripDownloadTypesExtention(item.SourceTitle) == name {
+		if utils.StripDownloadTypesExtention(item.SourceTitle) == name || item.SourceTitle == name {
 			return item.ID, true
 		}
 	}
-	log.Tracef("Sonarr.HistoryContains(): %s Not in History", name)
+	log.Tracef("Sonarr [%s]: %s Not in History", name)
 
 	return -1, false
 }
