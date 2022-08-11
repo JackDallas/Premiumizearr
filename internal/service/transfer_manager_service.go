@@ -69,7 +69,7 @@ func (t *TransferManagerService) CleanUpUnzipDir() {
 		log.Errorf("Error cleaning unzip directory: %s", err.Error())
 		return
 	}
-	
+
 }
 
 func (manager *TransferManagerService) ConfigUpdatedCallback(currentConfig config.Config, newConfig config.Config) {
@@ -110,6 +110,7 @@ func (manager *TransferManagerService) TaskUpdateTransfersList() {
 	}
 	manager.updateTransfers(transfers)
 
+	log.Tracef("Checking %d transfers against %d Arr clients", len(transfers), len(manager.arrsManager.GetArrs()))
 	for _, transfer := range transfers {
 		found := false
 		for _, arr := range manager.arrsManager.GetArrs() {
