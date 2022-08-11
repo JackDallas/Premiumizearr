@@ -24,7 +24,6 @@ type App struct {
 func (app *App) Lock()   {}
 func (app *App) UnLock() {}
 
-//Start
 func (app *App) Start(logLevel string, configFile string, loggingDirectory string) error {
 	//Setup static login
 	lvl, err := log.ParseLevel(logLevel)
@@ -98,6 +97,7 @@ func (app *App) Start(logLevel string, configFile string, loggingDirectory strin
 	// Must come after transfer, arrManager and directory
 	app.webServer.Init(&app.transferManager, &app.directoryWatcher, &app.arrsManager, &app.config)
 
+	app.arrsManager.Start()
 	app.webServer.Start()
 	app.directoryWatcher.Start()
 	//Block until the program is terminated
