@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jackdallas/premiumizearr/internal/config"
 	"github.com/jackdallas/premiumizearr/internal/utils"
 	"github.com/jackdallas/premiumizearr/pkg/premiumizeme"
 	"golift.io/starr/radarr"
@@ -54,6 +55,7 @@ type SonarrArr struct {
 	LastUpdate           time.Time
 	LastUpdateCount      int
 	LastUpdateCountMutex sync.Mutex
+	Config               *config.Config
 }
 
 type RadarrArr struct {
@@ -66,4 +68,5 @@ type RadarrArr struct {
 	LastUpdate           time.Time
 	LastUpdateCount      int
 	LastUpdateCountMutex sync.Mutex
+	Config               *config.Config
 }

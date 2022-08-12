@@ -26,7 +26,7 @@ func (arr *RadarrArr) GetHistory() (radarr.History, error) {
 	arr.LastUpdateCountMutex.Lock()
 	defer arr.LastUpdateCountMutex.Unlock()
 
-	if time.Since(arr.LastUpdate) > 30*time.Second || arr.History == nil {
+	if time.Since(arr.LastUpdate) > time.Duration(arr.Config.ArrHistoryUpdateIntervalSeconds)*time.Second || arr.History == nil {
 		his, err := arr.Client.GetHistory(0, 1000)
 		if err != nil {
 			return radarr.History{}, err
@@ -35,9 +35,10 @@ func (arr *RadarrArr) GetHistory() (radarr.History, error) {
 		arr.History = his
 		arr.LastUpdate = time.Now()
 		arr.LastUpdateCount = his.TotalRecords
+		log.Debugf("[Radarr] [%s]: Updated history, next update in %d seconds", arr.Name, arr.Config.ArrHistoryUpdateIntervalSeconds)
 	}
 
-	log.Tracef("Radarr.GetHistory(): Returning from GetHistory")
+	log.Tracef("[Radarr] [%s]: Returning from GetHistory", arr.Name)
 	return *arr.History, nil
 }
 

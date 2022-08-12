@@ -37,6 +37,7 @@ func (am *ArrsManagerService) Start() {
 				Client:     sonarr.New(c),
 				History:    nil,
 				LastUpdate: time.Now(),
+				Config:     am.config,
 			}
 			am.arrs = append(am.arrs, &wrapper)
 			log.Tracef("Added Sonarr arr: %s", arr_config.Name)
@@ -47,6 +48,7 @@ func (am *ArrsManagerService) Start() {
 				Client:     radarr.New(c),
 				History:    nil,
 				LastUpdate: time.Now(),
+				Config:     am.config,
 			}
 			am.arrs = append(am.arrs, &wrapper)
 			log.Tracef("Added Radarr arr: %s", arr_config.Name)
