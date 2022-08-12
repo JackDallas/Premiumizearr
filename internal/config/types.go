@@ -8,10 +8,10 @@ var (
 	ErrFailedToSaveConfig     = errors.New("failed to save config")
 )
 
-//ArrType enum for Sonarr/Radarr
+// ArrType enum for Sonarr/Radarr
 type ArrType string
 
-//AppCallback - Callback for the app to use
+// AppCallback - Callback for the app to use
 type AppCallback func(oldConfig Config, newConfig Config)
 
 const (
@@ -49,4 +49,6 @@ type Config struct {
 	WebRoot string `yaml:"WebRoot" json:"WebRoot"`
 
 	SimultaneousDownloads int `yaml:"SimultaneousDownloads" json:"SimultaneousDownloads"`
+
+	ArrHistoryUpdateIntervalSeconds int `yaml:"ArrHistoryUpdateIntervalSeconds" json:"ArrHistoryUpdateIntervalSeconds"`
 }

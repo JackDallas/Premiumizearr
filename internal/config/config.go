@@ -127,6 +127,12 @@ func loadConfigFromDisk(altConfigLocation string) (Config, error) {
 		updated = true
 	}
 
+	if configInterface["ArrHistoryUpdateIntervalSeconds"] == nil {
+		log.Info("ArrHistoryUpdateIntervalSeconds not set, setting to 20")
+		config.ArrHistoryUpdateIntervalSeconds = 20
+		updated = true
+	}
+
 	config.altConfigLocation = altConfigLocation
 
 	if updated {
@@ -154,15 +160,16 @@ func defaultConfig() Config {
 			{Name: "Sonarr", URL: "http://localhost:8989", APIKey: "xxxxxxxxx", Type: Sonarr},
 			{Name: "Radarr", URL: "http://localhost:7878", APIKey: "xxxxxxxxx", Type: Radarr},
 		},
-		BlackholeDirectory:           "",
-		PollBlackholeDirectory:       false,
-		PollBlackholeIntervalMinutes: 10,
-		DownloadsDirectory:           "",
-		UnzipDirectory:               "",
-		BindIP:                       "0.0.0.0",
-		BindPort:                     "8182",
-		WebRoot:                      "",
-		SimultaneousDownloads:        5,
+		BlackholeDirectory:              "",
+		PollBlackholeDirectory:          false,
+		PollBlackholeIntervalMinutes:    10,
+		DownloadsDirectory:              "",
+		UnzipDirectory:                  "",
+		BindIP:                          "0.0.0.0",
+		BindPort:                        "8182",
+		WebRoot:                         "",
+		SimultaneousDownloads:           5,
+		ArrHistoryUpdateIntervalSeconds: 20,
 	}
 }
 

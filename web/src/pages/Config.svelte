@@ -7,8 +7,8 @@
     Modal,
     FormGroup,
     Dropdown,
-Form,
-Checkbox,
+    Form,
+    Checkbox,
   } from "carbon-components-svelte";
   import {
     Save,
@@ -171,7 +171,7 @@ Checkbox,
       SetTestArr(index, HelpFilled, "secondary", false);
     }, 1000 * seconds);
   }
-  
+
   getConfig();
 </script>
 
@@ -180,6 +180,12 @@ Checkbox,
     <Column>
       <h4>*Arr Settings</h4>
       <FormGroup>
+        <TextInput
+          type="number"
+          disabled={inputDisabled}
+          labelText="Arr Update History Interval (seconds)"
+          bind:value={config.ArrHistoryUpdateIntervalSeconds}
+        />
         {#if config.Arrs !== undefined}
           {#each config.Arrs as arr, i}
             <h5>- {arr.Name ? arr.Name : i}</h5>
