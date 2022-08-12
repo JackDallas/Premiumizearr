@@ -21,6 +21,15 @@ func StripDownloadTypesExtention(fileName string) string {
 	return fileName
 }
 
+func StripMediaTypesExtention(fileName string) string {
+	var exts = [...]string{".mkv", ".mp4", ".avi", ".mov", ".flv", ".wmv", ".mpg", ".mpeg", ".m4v", ".3gp", ".3g2", ".m2ts", ".mts", ".ts", ".webm", ".m4a", ".m4b", ".m4p", ".m4r", ".m4v"}
+	for _, ext := range exts {
+		fileName = strings.TrimSuffix(fileName, ext)
+	}
+
+	return fileName
+}
+
 // https://golangcode.com/unzip-files-in-go/
 func Unzip(src string, dest string) error {
 	r, err := zip.OpenReader(src)
@@ -152,22 +161,22 @@ func IsDirectoryWriteable(path string) bool {
 	return true
 }
 
-//https://stackoverflow.com/questions/33450980/how-to-remove-all-contents-of-a-directory-using-golang
+// https://stackoverflow.com/questions/33450980/how-to-remove-all-contents-of-a-directory-using-golang
 func RemoveContents(dir string) error {
 	d, err := os.Open(dir)
 	if err != nil {
-			return err
+		return err
 	}
 	defer d.Close()
 	names, err := d.Readdirnames(-1)
 	if err != nil {
-			return err
+		return err
 	}
 	for _, name := range names {
-			err = os.RemoveAll(filepath.Join(dir, name))
-			if err != nil {
-					return err
-			}
+		err = os.RemoveAll(filepath.Join(dir, name))
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
