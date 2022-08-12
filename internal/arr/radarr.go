@@ -5,7 +5,6 @@ import (
 	"math"
 	"time"
 
-	"github.com/jackdallas/premiumizearr/internal/utils"
 	"github.com/jackdallas/premiumizearr/pkg/premiumizeme"
 	log "github.com/sirupsen/logrus"
 	"golift.io/starr"
@@ -84,14 +83,12 @@ func (arr *RadarrArr) HistoryContains(name string) (int64, bool) {
 		log.Errorf("Radarr [%s]: Failed to get history: %+v", arr.Name, err)
 		return -1, false
 	}
-	log.Trace("Radarr [%s]: Got History, now Locking History", arr.Name)
+	log.Tracef("Radarr [%s]: Got History, now Locking History", arr.Name)
 	arr.HistoryMutex.Lock()
 	defer arr.HistoryMutex.Unlock()
 
-	name = utils.StripDownloadTypesExtention(name)
-	// name = strings.ReplaceAll(name, ".", " ")
 	for _, item := range his.Records {
-		if utils.StripDownloadTypesExtention(item.SourceTitle) == name || item.SourceTitle == name {
+		if CompareFileNamesFuzzy(item.SourceTitle, name) {
 			return item.ID, true
 		}
 	}
