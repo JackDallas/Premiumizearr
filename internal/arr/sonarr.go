@@ -5,7 +5,6 @@ import (
 	"math"
 	"time"
 
-	"github.com/jackdallas/premiumizearr/internal/utils"
 	"github.com/jackdallas/premiumizearr/pkg/premiumizeme"
 	log "github.com/sirupsen/logrus"
 	"golift.io/starr"
@@ -82,17 +81,16 @@ func (arr *SonarrArr) HistoryContains(name string) (int64, bool) {
 	if err != nil {
 		return 0, false
 	}
-	log.Trace("Sonarr [%s]: Got History, now Locking History")
+	log.Tracef("Sonarr [%s]: Got History, now Locking History", arr.Name)
 	arr.HistoryMutex.Lock()
 	defer arr.HistoryMutex.Unlock()
 
-	name = utils.StripDownloadTypesExtention(name)
 	for _, item := range his.Records {
-		if utils.StripDownloadTypesExtention(item.SourceTitle) == name || item.SourceTitle == name {
+		if CompareFileNamesFuzzy(item.SourceTitle, name) {
 			return item.ID, true
 		}
 	}
-	log.Tracef("Sonarr [%s]: %s Not in History", name)
+	log.Tracef("Sonarr [%s]: %s Not in History", arr.Name, name)
 
 	return -1, false
 }

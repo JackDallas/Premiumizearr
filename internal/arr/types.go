@@ -1,13 +1,26 @@
 package arr
 
 import (
+	"strings"
 	"sync"
 	"time"
 
+	"github.com/jackdallas/premiumizearr/internal/utils"
 	"github.com/jackdallas/premiumizearr/pkg/premiumizeme"
 	"golift.io/starr/radarr"
 	"golift.io/starr/sonarr"
 )
+
+func CompareFileNamesFuzzy(a, b string) bool {
+	//strip file extension
+	a = utils.StripDownloadTypesExtention(a)
+	b = utils.StripDownloadTypesExtention(b)
+	//Replace spaces with periods
+	a = strings.ReplaceAll(a, " ", ".")
+	b = strings.ReplaceAll(b, " ", ".")
+
+	return a == b
+}
 
 type IArr interface {
 	HistoryContains(string) (int64, bool)
