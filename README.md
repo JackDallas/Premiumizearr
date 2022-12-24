@@ -1,5 +1,10 @@
 # Premiumizearr
 
+This project is in maintenance mode, I'll address security issues and feature PR's if people want to submit them but I no longer use the service as the 1tb limit was to low for my needs.
+
+If anyone creates a fork they add features to I'll happily list them here as an alternative, just open an issue.
+
+
 [![Build](https://github.com/JackDallas/Premiumizearr/actions/workflows/build.yml/badge.svg)](https://github.com/JackDallas/Premiumizearr/actions/workflows/build.yml)
 
 ## Features
