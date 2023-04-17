@@ -8,7 +8,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/orandin/lumberjackrus v1.0.1
 	github.com/sirupsen/logrus v1.9.0
-	golift.io/starr v0.13.0
+	golift.io/starr v0.14.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
