@@ -3,7 +3,7 @@ module github.com/jackdallas/premiumizearr
 go 1.17
 
 require (
-	github.com/dustin/go-humanize v1.0.0
+	github.com/dustin/go-humanize v1.0.1
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/gorilla/mux v1.8.0
 	github.com/orandin/lumberjackrus v1.0.1
