@@ -14,7 +14,7 @@
     "svelte-loader": "^3.0.0",
     "webpack": "^5.82.0",
     "webpack-cli": "^5.0.1",
-    "webpack-dev-server": "^4.0.0"
+    "webpack-dev-server": "^4.15.0"
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack",
