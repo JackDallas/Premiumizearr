@@ -21,7 +21,7 @@ jobs:
           PR_URL: ${{github.event.pull_request.html_url}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - name: Auto Approve Dependabot PRs
-        run: gh pr review --approve -b "Dependabot auto approve"
+        run: gh pr review --approve -b "Dependabot auto approve" "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
