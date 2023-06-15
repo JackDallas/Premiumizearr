@@ -14,11 +14,11 @@ import (
 
 func CompareFileNamesFuzzy(a, b string) bool {
 	//Strip file extension
-	a = utils.StripDownloadTypesExtention(a)
-	b = utils.StripDownloadTypesExtention(b)
+	a = utils.StripDownloadTypesExtension(a)
+	b = utils.StripDownloadTypesExtension(b)
 	//Strip media type extension
-	a = utils.StripMediaTypesExtention(a)
-	b = utils.StripMediaTypesExtention(b)
+	a = utils.StripMediaTypesExtension(a)
+	b = utils.StripMediaTypesExtension(b)
 	//Strip Spaces
 	a = strings.ReplaceAll(a, " ", "")
 	b = strings.ReplaceAll(b, " ", "")

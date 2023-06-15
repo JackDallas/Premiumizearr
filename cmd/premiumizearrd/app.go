@@ -18,17 +18,20 @@ type App struct {
 	directoryWatcher   service.DirectoryWatcherService
 	webServer          service.WebServerService
 	arrsManager        service.ArrsManagerService
+	downloadManager    service.DownloadManagerService
+	taskRunner         service.TaskRunnerService
 }
 
 // Makes go vet error - prevents copies
 func (app *App) Lock()   {}
 func (app *App) UnLock() {}
 
+// Start
 func (app *App) Start(logLevel string, configFile string, loggingDirectory string) error {
 	//Setup static login
 	lvl, err := log.ParseLevel(logLevel)
 	if err != nil {
-		log.Errorf("Error flag not recognized, defaulting to Info!!", err)
+		log.Errorf("Error flag not recognized, defaulting to Info!! %v", err)
 		lvl = log.InfoLevel
 	}
 	log.SetLevel(lvl)
@@ -87,10 +90,16 @@ func (app *App) Start(logLevel string, configFile string, loggingDirectory strin
 	app.directoryWatcher = service.DirectoryWatcherService{}.New()
 	app.webServer = service.WebServerService{}.New()
 	app.arrsManager = service.ArrsManagerService{}.New()
+	app.downloadManager = service.DownloadManagerService{}.New()
+	app.taskRunner = service.TaskRunnerService{}.New()
 
 	// Initialise Services
+	app.taskRunner.Init(&app.config)
+
+	// Must come after taskRunner initialised
 	app.arrsManager.Init(&app.config)
 	app.directoryWatcher.Init(&app.premiumizemeClient, &app.config)
+	app.downloadManager.Init(&app.premiumizemeClient, &app.taskRunner, &app.config)
 
 	// Must come after arrsManager
 	app.transferManager.Init(&app.premiumizemeClient, &app.arrsManager, &app.config)
@@ -100,6 +109,7 @@ func (app *App) Start(logLevel string, configFile string, loggingDirectory strin
 	app.arrsManager.Start()
 	app.webServer.Start()
 	app.directoryWatcher.Start()
+	app.taskRunner.Start()
 	//Block until the program is terminated
 	app.transferManager.Run(15 * time.Second)
 

@@ -1,4 +1,4 @@
-package progress_downloader
+package downloadmanager
 
 // https://golangcode.com/download-a-file-with-progress/
 
@@ -19,6 +19,7 @@ type WriteCounter struct {
 	LastUpdate time.Time
 	LastAmount uint64
 	Total      uint64
+	Closing    bool
 }
 
 func NewWriteCounter() *WriteCounter {
@@ -41,6 +42,9 @@ func (wc *WriteCounter) GetSpeed() string {
 }
 
 func (wc *WriteCounter) Write(p []byte) (int, error) {
+	if wc.Closing {
+		return 0, io.ErrClosedPipe
+	}
 	n := len(p)
 	wc.LastAmount = wc.Total
 	wc.Total += uint64(n)
@@ -52,9 +56,6 @@ func (wc WriteCounter) GetProgress() string {
 	return fmt.Sprintf("%s complete", humanize.Bytes(wc.Total))
 }
 
-// DownloadFile will download a url to a local file. It's efficient because it will
-// write as it downloads and not load the whole file into memory. We pass an io.TeeReader
-// into Copy() to report progress on the download.
 func DownloadFile(url string, filepath string, counter *WriteCounter) error {
 
 	// Create the file, but give it a tmp file extension, this means we won't overwrite a
@@ -72,6 +73,7 @@ func DownloadFile(url string, filepath string, counter *WriteCounter) error {
 	}
 	defer resp.Body.Close()
 
+	// resp.Body.
 	if _, err = io.Copy(out, io.TeeReader(resp.Body, counter)); err != nil {
 		out.Close()
 		return err

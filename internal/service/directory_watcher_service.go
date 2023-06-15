@@ -1,7 +1,7 @@
 package service
 
 import (
-	"io/ioutil"
+	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
@@ -62,7 +62,7 @@ func (dw *DirectoryWatcherService) GetStatus() string {
 	return dw.status
 }
 
-//Start: This is the entrypoint for the directory watcher
+// Start: This is the entrypoint for the directory watcher
 func (dw *DirectoryWatcherService) Start() {
 	log.Info("Starting directory watcher...")
 
@@ -112,14 +112,14 @@ func (dw *DirectoryWatcherService) Start() {
 
 func (dw *DirectoryWatcherService) directoryScan(p string) {
 	log.Trace("Running directory scan")
-	files, err := ioutil.ReadDir(p)
+	files, err := os.ReadDir(p)
 	if err != nil {
 		log.Errorf("Error with directory scan %+v", err)
 		return
 	}
 
 	for _, file := range files {
-		go func(file os.FileInfo) {
+		go func(file fs.DirEntry) {
 			file_path := path.Join(p, file.Name())
 			if dw.checkFile(file_path) {
 				dw.addFileToQueue(file_path)
@@ -182,7 +182,7 @@ func (dw *DirectoryWatcherService) processUploads() {
 					log.Trace("File already uploaded, removing from Disk")
 					os.Remove(filePath)
 				default:
-					log.Error("Error creating transfer: %s", err)
+					log.Errorf("Error creating transfer: %s", err)
 				}
 			} else {
 				dw.status = "Okay"
@@ -194,7 +194,7 @@ func (dw *DirectoryWatcherService) processUploads() {
 			}
 			time.Sleep(time.Second * time.Duration(sleepTimeSeconds))
 		} else {
-			log.Errorf("Received %s from blackhole Queue. Appears to be an empty path.")
+			log.Error("Received blank string from blackhole Queue.")
 		}
 	}
 }
