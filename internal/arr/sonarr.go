@@ -69,7 +69,7 @@ func (arr *SonarrArr) HistoryContains(name string) (int64, bool) {
 			return item.ID, true
 		}
 	}
-	log.Tracef("Sonarr [%s]: %s Not in History", name)
+	log.Tracef("Sonarr [%s]: %s Not in History", arr.Name, name)
 
 	return -1, false
 }

@@ -112,11 +112,15 @@
         <h3>Downloads</h3>
         <APITable
           headers={[
+            { key : "id", value : "ID" },
             { key: "added", value: "Added" },
             { key: "name", value: "Name" },
             { key: "progress", value: "Progress" },
             { key: "speed", value: "Speed" },
           ]}
+          sortable={false}
+          sortKey={"id"}
+          sortOrder={"desc"}
           updateTimeSeconds={2}
           APIpath="api/downloads"
           zebra={true}

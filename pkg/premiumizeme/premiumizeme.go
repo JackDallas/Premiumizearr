@@ -135,27 +135,39 @@ func (pm *Premiumizeme) GetFolders() ([]Item, error) {
 	}
 
 	var ret []Item
-	req, _ := http.NewRequest("GET", url.String(), nil)
+	req, err := http.NewRequest("GET", url.String(), nil)
+	if err != nil {
+		return ret, err
+	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return ret, err
 	}
 
-	defer resp.Body.Close()
-	res := ListFoldersResponse{}
-	err = json.NewDecoder(resp.Body).Decode(&res)
+	if resp.StatusCode != 200 {
+		return ret, fmt.Errorf("error listing folder: %s (%d)", resp.Status, resp.StatusCode)
+	}
 
-	if res.Status != "success" {
-		return ret, fmt.Errorf("%s", res.Status)
+	defer resp.Body.Close()
+	list_folders_res := ListFoldersResponse{}
+	err = json.NewDecoder(resp.Body).Decode(&list_folders_res)
+	if err != nil {
+		return ret, err
+	}
+
+	if list_folders_res.Status != "success" {
+		fmt.Printf("%+v\n", resp)
+		fmt.Printf("%+v\n", list_folders_res)
+		return ret, fmt.Errorf(list_folders_res.Message)
 	}
 
 	if err != nil {
 		return ret, err
 	}
 
-	log.Tracef("Received %d Folders", len(res.Content))
-	return res.Content, nil
+	log.Tracef("Received %d Folders", len(list_folders_res.Content))
+	return list_folders_res.Content, nil
 }
 
 func (pm *Premiumizeme) CreateTransfer(filePath string, parentID string) error {

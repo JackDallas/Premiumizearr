@@ -12,7 +12,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func StripDownloadTypesExtention(fileName string) string {
+func StripDownloadTypesExtension(fileName string) string {
 	var exts = [...]string{".nzb", ".magnet"}
 	for _, ext := range exts {
 		fileName = strings.TrimSuffix(fileName, ext)
@@ -21,7 +21,7 @@ func StripDownloadTypesExtention(fileName string) string {
 	return fileName
 }
 
-func StripMediaTypesExtention(fileName string) string {
+func StripMediaTypesExtension(fileName string) string {
 	var exts = [...]string{".mkv", ".mp4", ".avi", ".mov", ".flv", ".wmv", ".mpg", ".mpeg", ".m4v", ".3gp", ".3g2", ".m2ts", ".mts", ".ts", ".webm", ".m4a", ".m4b", ".m4p", ".m4r", ".m4v"}
 	for _, ext := range exts {
 		fileName = strings.TrimSuffix(fileName, ext)
@@ -93,11 +93,11 @@ func StringInSlice(a string, list []string) int {
 
 func GetDownloadsFolderIDFromPremiumizeme(premiumizemeClient *premiumizeme.Premiumizeme) string {
 	var downloadsFolderID string
+
 	folders, err := premiumizemeClient.GetFolders()
 	if err != nil {
 		log.Errorf("Error getting folders: %s", err)
-		log.Errorf("Cannot read folders from premiumize.me, application will not run!")
-		return ""
+		log.Fatal("Cannot read folders from premiumize.me, application will not run!")
 	}
 
 	const folderName = "arrDownloads"
@@ -143,18 +143,18 @@ func IsRunningInDockerContainer() bool {
 
 func IsDirectoryWriteable(path string) bool {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		log.Errorf("Directory does not exist: ", path)
+		log.Errorf("Directory does not exist: %s", path)
 		return false
 	}
 
 	if _, err := os.Create(path + "/test.txt"); err != nil {
-		log.Errorf("Cannot write test.txt to directory: ", path)
+		log.Errorf("Cannot write test.txt to directory: %s", path)
 		return false
 	}
 
 	// Delete test file
 	if err := os.Remove(path + "/test.txt"); err != nil {
-		log.Errorf("Cannot delete test.txt file in: ", path)
+		log.Errorf("Cannot delete test.txt file in: %s", path)
 		return false
 	}
 

@@ -49,7 +49,7 @@ type Item struct {
 }
 type FolderItems struct {
 	Status   string `json:"status"`
-	Contant  []Item `json:"content"`
+	Content  []Item `json:"content"`
 	Name     string `json:"name"`
 	ParentID string `json:"parent_id"`
 	FolderID string `json:"folder_id"`
