@@ -7,7 +7,7 @@
     "carbon-preprocess-svelte": "^0.9.1",
     "copy-webpack-plugin": "^11.0.0",
     "cross-env": "^7.0.0",
-    "css-loader": "^5.0.0",
+    "css-loader": "^6.8.1",
     "esbuild-loader": "^2.0.0",
     "mini-css-extract-plugin": "^2.7.5",
     "svelte": "^3.59.1",
