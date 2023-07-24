@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "devDependencies": {
     "carbon-components-svelte": "^0.78.0",
-    "carbon-icons-svelte": "^12.0.0",
+    "carbon-icons-svelte": "^12.1.0",
     "carbon-preprocess-svelte": "^0.10.0",
     "copy-webpack-plugin": "^11.0.0",
     "cross-env": "^7.0.0",
