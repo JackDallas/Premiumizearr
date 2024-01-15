@@ -5,7 +5,7 @@
     "carbon-components-svelte": "^0.82.7",
     "carbon-icons-svelte": "^12.4.2",
     "carbon-preprocess-svelte": "^0.10.0",
-    "copy-webpack-plugin": "^11.0.0",
+    "copy-webpack-plugin": "^12.0.1",
     "cross-env": "^7.0.0",
     "css-loader": "^6.8.1",
     "esbuild-loader": "^4.0.2",
