@@ -9,7 +9,7 @@
     "cross-env": "^7.0.0",
     "css-loader": "^6.8.1",
     "esbuild-loader": "^4.0.2",
-    "mini-css-extract-plugin": "^2.7.6",
+    "mini-css-extract-plugin": "^2.7.7",
     "svelte": "^4.2.8",
     "svelte-loader": "^3.1.9",
     "webpack": "^5.89.0",
