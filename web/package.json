@@ -10,7 +10,7 @@
     "css-loader": "^6.10.0",
     "esbuild-loader": "^4.0.3",
     "mini-css-extract-plugin": "^2.8.0",
-    "svelte": "^4.2.11",
+    "svelte": "^4.2.12",
     "svelte-loader": "^3.1.9",
     "webpack": "^5.90.2",
     "webpack-cli": "^5.1.4",
