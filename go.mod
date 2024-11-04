@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/dustin/go-humanize v1.0.1
-	github.com/fsnotify/fsnotify v1.7.0
+	github.com/fsnotify/fsnotify v1.8.0
 	github.com/gorilla/mux v1.8.1
 	github.com/orandin/lumberjackrus v1.0.1
 	github.com/sirupsen/logrus v1.9.3
