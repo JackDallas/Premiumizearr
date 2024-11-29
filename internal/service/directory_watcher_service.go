@@ -12,7 +12,7 @@ import (
 	"github.com/jackdallas/premiumizearr/internal/utils"
 	"github.com/jackdallas/premiumizearr/pkg/premiumizeme"
 	"github.com/jackdallas/premiumizearr/pkg/stringqueue"
-	btutils "github.com/tekintian/torrent_convert_utils"
+	"github.com/tekintian/torrent_convert_utils"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -173,7 +173,7 @@ func (dw *DirectoryWatcherService) processUploads() {
 		if filePath != "" {
 			log.Debugf("Processing %s", filePath)
 			if filepath.Ext(filePath) == ".torrent" {
-				magnetLink, err := btutils.TorrentFileToMagnet(filePath)
+				magnetLink, err := torrent_convert_utils.TorrentFileToMagnet(filePath)
 				if err != nil {
 					log.Errorf("Error converting torrent to magnet: %s", err)
 					continue
