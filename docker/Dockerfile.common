@@ -19,5 +19,6 @@ ENV PREMIUMIZEARR_LOGGING_DIR_PATH=/data
 
 COPY dist/Premiumizearr_linux_amd64_v1/premiumizearrd /opt/app/
 COPY build/static /opt/app/static
+RUN chmod +x /opt/app/premiumizearrd /etc/cont-init.d/* /etc/services.d/premiumizearr/*
 
 ENTRYPOINT ["/init"]

@@ -171,6 +171,28 @@ func (dw *DirectoryWatcherService) processUploads() {
 		sleepTimeSeconds := 2
 		if filePath != "" {
 			log.Debugf("Processing %s", filePath)
+			if filepath.Ext(filePath) == ".torrent" {
+				magnetLink, err := btutils.TorrentFileToMagnet(filePath)
+				if err != nil {
+					log.Errorf("Error converting torrent to magnet: %s", err)
+					continue
+				}
+
+				magnetFilePath := filePath[:len(filePath)-len(filepath.Ext(filePath))] + ".magnet"
+				err = ioutil.WriteFile(magnetFilePath, []byte(magnetLink), 0644)
+				if err != nil {
+					log.Errorf("Error writing magnet file: %s", err)
+					continue
+				}
+
+				err = os.Remove(filePath)
+				if err != nil {
+					log.Errorf("Error removing torrent file: %s", err)
+					continue
+				}
+
+				filePath = magnetFilePath
+			}
 			err := dw.premiumizemeClient.CreateTransfer(filePath, dw.downloadsFolderID)
 			if err != nil {
 				switch err.Error() {

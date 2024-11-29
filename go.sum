@@ -23,6 +23,12 @@ github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
+github.com/tekintian/bencode v0.0.0-20220626085045-ca639a470c22 h1:3+mRB2sMbpphXi68eumU2n7fPQOgM5/m1bOIzf48JsY=
+github.com/tekintian/bencode v0.0.0-20220626085045-ca639a470c22/go.mod h1:wvvMGkEFfwbUhDw67RBIfIi4Ey1dBnsy0PFpWTy+hA0=
+github.com/tekintian/metainfo v1.0.0 h1:V26CnvoIKZVypKA5DOj2SeUcSiw67QEhreY+p9CRQeI=
+github.com/tekintian/metainfo v1.0.0/go.mod h1:PkJVMykoRAb2Fvy6FuiZBUTfAd+nWKPGDfvAnzDrBi8=
+github.com/tekintian/torrent_convert_utils v1.0.2 h1:+fjWEQTTIioHzwTYC09S+jl7yOiryDFzcty4kZVMh5Y=
+github.com/tekintian/torrent_convert_utils v1.0.2/go.mod h1:YDW38q6+268J7u78lDQV9WgU7nICqTE3AedVVqAMpHQ=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20210921155107-089bfa567519/go.mod h1:GvvjBRRGRdwPK5ydBHafDWAxML/pGHZbMvKqRZ5+Abc=

@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	btutils "github.com/tekintian/torrent_convert_utils"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -188,7 +189,6 @@ func (pm *Premiumizeme) CreateTransfer(filePath string, parentID string) error {
 	case ".nzb":
 		request, err = createNZBRequest(file, &url, parentID)
 	case ".magnet":
-	case ".torrent":
 		request, err = createMagnetRequest(file, &url, parentID)
 	}
 
