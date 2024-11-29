@@ -143,7 +143,7 @@ func (dw *DirectoryWatcherService) checkFile(path string) bool {
 	}
 
 	ext := filepath.Ext(path)
-	if ext == ".nzb" || ext == ".magnet" {
+	if ext == ".nzb" || ext == ".magnet" || ext == ".torrent" {
 		return true
 	} else {
 		return false

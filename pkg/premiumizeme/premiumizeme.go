@@ -188,6 +188,7 @@ func (pm *Premiumizeme) CreateTransfer(filePath string, parentID string) error {
 	case ".nzb":
 		request, err = createNZBRequest(file, &url, parentID)
 	case ".magnet":
+	case ".torrent":
 		request, err = createMagnetRequest(file, &url, parentID)
 	}
 
