@@ -180,7 +180,7 @@ func (dw *DirectoryWatcherService) processUploads() {
 				}
 
 				magnetFilePath := filePath[:len(filePath)-len(filepath.Ext(filePath))] + ".magnet"
-				err = ioutil.WriteFile(magnetFilePath, []byte(magnetLink), 0644)
+				err = os.WriteFile(magnetFilePath, []byte(magnetLink), 0644)
 				if err != nil {
 					log.Errorf("Error writing magnet file: %s", err)
 					continue
