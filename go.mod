@@ -14,6 +14,9 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.0.0 // indirect
+	github.com/tekintian/bencode v0.0.0-20220626085045-ca639a470c22 // indirect
+	github.com/tekintian/metainfo v1.0.0 // indirect
+	github.com/tekintian/torrent_convert_utils v1.0.2 // indirect
 	golang.org/x/net v0.23.0 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect

@@ -13,7 +13,7 @@ import (
 )
 
 func StripDownloadTypesExtention(fileName string) string {
-	var exts = [...]string{".nzb", ".magnet"}
+	var exts = [...]string{".nzb", ".magnet", ".torrent"}
 	for _, ext := range exts {
 		fileName = strings.TrimSuffix(fileName, ext)
 	}

@@ -12,6 +12,7 @@ import (
 	"github.com/jackdallas/premiumizearr/internal/utils"
 	"github.com/jackdallas/premiumizearr/pkg/premiumizeme"
 	"github.com/jackdallas/premiumizearr/pkg/stringqueue"
+	"github.com/tekintian/torrent_convert_utils"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -143,7 +144,7 @@ func (dw *DirectoryWatcherService) checkFile(path string) bool {
 	}
 
 	ext := filepath.Ext(path)
-	if ext == ".nzb" || ext == ".magnet" {
+	if ext == ".nzb" || ext == ".magnet" || ext == ".torrent" {
 		return true
 	} else {
 		return false
@@ -171,6 +172,28 @@ func (dw *DirectoryWatcherService) processUploads() {
 		sleepTimeSeconds := 2
 		if filePath != "" {
 			log.Debugf("Processing %s", filePath)
+			if filepath.Ext(filePath) == ".torrent" {
+				magnetLink, err := btutils.TorrentToMagnet(filePath)
+				if err != nil {
+					log.Errorf("Error converting torrent to magnet: %s", err)
+					continue
+				}
+
+				magnetFilePath := filePath[:len(filePath)-len(filepath.Ext(filePath))] + ".magnet"
+				err = os.WriteFile(magnetFilePath, []byte(magnetLink), 0644)
+				if err != nil {
+					log.Errorf("Error writing magnet file: %s", err)
+					continue
+				}
+
+				err = os.Remove(filePath)
+				if err != nil {
+					log.Errorf("Error removing torrent file: %s", err)
+					continue
+				}
+
+				filePath = magnetFilePath
+			}
 			err := dw.premiumizemeClient.CreateTransfer(filePath, dw.downloadsFolderID)
 			if err != nil {
 				switch err.Error() {
