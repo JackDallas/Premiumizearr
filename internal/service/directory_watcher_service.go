@@ -173,7 +173,7 @@ func (dw *DirectoryWatcherService) processUploads() {
 		if filePath != "" {
 			log.Debugf("Processing %s", filePath)
 			if filepath.Ext(filePath) == ".torrent" {
-				magnetLink, err := btutils.TorrentFileToMagnet(filePath)
+				magnetLink, err := btutils.TorrentToMagnet(filePath)
 				if err != nil {
 					log.Errorf("Error converting torrent to magnet: %s", err)
 					continue
