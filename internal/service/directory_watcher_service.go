@@ -12,6 +12,7 @@ import (
 	"github.com/jackdallas/premiumizearr/internal/utils"
 	"github.com/jackdallas/premiumizearr/pkg/premiumizeme"
 	"github.com/jackdallas/premiumizearr/pkg/stringqueue"
+	btutils "github.com/tekintian/torrent_convert_utils"
 	log "github.com/sirupsen/logrus"
 )
 
