@@ -1,3 +1,6 @@
+# No longer maintained
+# Check out the https://github.com/ensingerphilipp/Premiumizearr-Nova fork
+
 # Premiumizearr
 
 ## Build
