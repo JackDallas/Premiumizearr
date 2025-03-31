@@ -21,6 +21,6 @@
     "dev": "webpack serve --static public"
   },
   "dependencies": {
-    "luxon": "^3.5.0"
+    "luxon": "^3.6.0"
   }
 }
