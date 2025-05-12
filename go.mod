@@ -1,11 +1,12 @@
 module github.com/jackdallas/premiumizearr
 
-go 1.17
+go 1.23.0
+
 toolchain go1.24.1
 
 require (
 	github.com/dustin/go-humanize v1.0.1
-	github.com/fsnotify/fsnotify v1.8.0
+	github.com/fsnotify/fsnotify v1.9.0
 	github.com/gorilla/mux v1.8.1
 	github.com/orandin/lumberjackrus v1.0.1
 	github.com/sirupsen/logrus v1.9.3
