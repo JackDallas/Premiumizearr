@@ -4,7 +4,7 @@
   "devDependencies": {
     "carbon-components-svelte": "^0.93.0",
     "carbon-icons-svelte": "^13.6.0",
-    "carbon-preprocess-svelte": "^0.11.12",
+    "carbon-preprocess-svelte": "^0.11.14",
     "copy-webpack-plugin": "^13.0.1",
     "cross-env": "^10.1.0",
     "css-loader": "^7.1.2",
