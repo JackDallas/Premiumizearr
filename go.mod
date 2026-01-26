@@ -1,6 +1,6 @@
 module github.com/jackdallas/premiumizearr
 
-go 1.23.0
+go 1.24.0
 
 toolchain go1.24.1
 
@@ -10,13 +10,13 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/orandin/lumberjackrus v1.0.1
 	github.com/sirupsen/logrus v1.9.4
-	golift.io/starr v1.2.1
+	golift.io/starr v1.3.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
 	github.com/BurntSushi/toml v1.0.0 // indirect
-	golang.org/x/net v0.38.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/net v0.49.0 // indirect
+	golang.org/x/sys v0.40.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 )
