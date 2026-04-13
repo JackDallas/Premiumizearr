@@ -2,7 +2,7 @@
   "name": "premiumizearr-ui",
   "version": "0.0.1",
   "devDependencies": {
-    "carbon-components-svelte": "^0.105.1",
+    "carbon-components-svelte": "^0.106.0",
     "carbon-icons-svelte": "^13.10.0",
     "carbon-preprocess-svelte": "^0.11.30",
     "copy-webpack-plugin": "^14.0.0",
